@@ -1,0 +1,125 @@
+{
+  "Version": 1,
+  "Hash": "6ppAHg5ZJwwu18E3SasyQzL7o2SFhCOwiHA1WkENRHs=",
+  "Source": "CajuTalkAPI",
+  "BasePath": "_content/CajuTalkAPI",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "CajuTalkAPI\\wwwroot",
+      "Source": "CajuTalkAPI",
+      "ContentRoot": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\",
+      "BasePath": "_content/CajuTalkAPI",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "SourceId": "CajuTalkAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\",
+      "BasePath": "_content/CajuTalkAPI",
+      "RelativePath": "uploads/sungjinwoo#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "5jhnela5po",
+      "Integrity": "fyXyHejPUS/1ECVmvVWGjMEshPNVN1A191UarSzwvR8=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\sungjinwoo.jpg"
+    }
+  ],
+  "Endpoints": [
+    {
+      "Route": "uploads/sungjinwoo.5jhnela5po.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "173284"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"fyXyHejPUS/1ECVmvVWGjMEshPNVN1A191UarSzwvR8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 14:33:35 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "5jhnela5po"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/sungjinwoo.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-fyXyHejPUS/1ECVmvVWGjMEshPNVN1A191UarSzwvR8="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/sungjinwoo.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "173284"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"fyXyHejPUS/1ECVmvVWGjMEshPNVN1A191UarSzwvR8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 14:33:35 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-fyXyHejPUS/1ECVmvVWGjMEshPNVN1A191UarSzwvR8="
+        }
+      ]
+    }
+  ]
+}

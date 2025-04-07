@@ -1,0 +1,29 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "PackagePath": "staticwebassets\\uploads\\sungjinwoo.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.CajuTalkAPI.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.CajuTalkAPI.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.build.CajuTalkAPI.props",
+      "PackagePath": "build\\CajuTalkAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildMultiTargeting.CajuTalkAPI.props",
+      "PackagePath": "buildMultiTargeting\\CajuTalkAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net9.0\\staticwebassets\\msbuild.buildTransitive.CajuTalkAPI.props",
+      "PackagePath": "buildTransitive\\CajuTalkAPI.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
