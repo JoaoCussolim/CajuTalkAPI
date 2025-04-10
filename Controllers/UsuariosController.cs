@@ -32,12 +32,14 @@ namespace TWTodos.Controllers
             return CreatedAtAction(nameof(ObterPorId), new { id = usuario.ID }, usuario);
         }
 
+        // Get De todos os Usuarios
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> ObterTodos()
         {
             return await _context.Usuarios.ToListAsync();
         }
 
+        // Get do id do Usuario Selecionado
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> ObterPorId(int id)
         {
