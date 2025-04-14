@@ -18,12 +18,13 @@ namespace TWTodos.Controllers
             _env = env;
         }
 
+        // Rota Post para criar novos usuÃ¡rios
         [HttpPost]
         public async Task<IActionResult> CriarUsuario([FromBody] Usuario usuario)
         {
             if (await _context.Usuarios.AnyAsync(u => u.LoginUsuario == usuario.LoginUsuario))
             {
-                return Conflict("Email ou login já está em uso.");
+                return Conflict("Email ou login jï¿½ estï¿½ em uso.");
             }
 
             _context.Usuarios.Add(usuario);
@@ -32,14 +33,14 @@ namespace TWTodos.Controllers
             return CreatedAtAction(nameof(ObterPorId), new { id = usuario.ID }, usuario);
         }
 
-        // Get De todos os Usuarios
+        // Rota Get para obter todos os usuÃ¡rios
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> ObterTodos()
         {
             return await _context.Usuarios.ToListAsync();
         }
 
-        // Get do id do Usuario Selecionado
+        // Rota Get para obter os dados do usuÃ¡rio selecionados
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> ObterPorId(int id)
         {
@@ -51,11 +52,12 @@ namespace TWTodos.Controllers
             return usuario;
         }
 
+        // Rota Post para trocar a foto de perfil de um usuÃ¡rio
         [HttpPost("upload-foto")]
         public async Task<IActionResult> UploadFoto([FromForm] IFormFile imagem, [FromForm] int usuarioID)
         {
             if (imagem == null || imagem.Length == 0)
-                return BadRequest("Imagem inválida.");
+                return BadRequest("Imagem invï¿½lida.");
 
             var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagem.FileName);
             var caminhoUploads = Path.Combine(_env.WebRootPath, "uploads");
@@ -74,7 +76,7 @@ namespace TWTodos.Controllers
 
             var usuario = await _context.Usuarios.FindAsync(usuarioID);
             if (usuario == null)
-                return NotFound("Usuário não encontrado.");
+                return NotFound("Usuï¿½rio nï¿½o encontrado.");
 
             usuario.FotoPerfilURL = urlRelativa;
             await _context.SaveChangesAsync();

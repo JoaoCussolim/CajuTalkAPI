@@ -16,6 +16,7 @@ namespace TWTodos.Controllers
             _context = context;
         }
 
+        // Rota Post para enviar uma mensagem dentro de uma sala
         [HttpPost]
         public async Task<IActionResult> EnviarMensagem([FromBody] Mensagem mensagem)
         {
@@ -26,6 +27,7 @@ namespace TWTodos.Controllers
             return Ok(mensagem);
         }
 
+        // Rota get que obtem as mensagens de uma sala pelo seu ID
         [HttpGet("sala/{idSala}")]
         public async Task<ActionResult<IEnumerable<Mensagem>>> ObterMensagensPorSala(int idSala)
         {
