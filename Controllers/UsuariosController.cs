@@ -24,7 +24,7 @@ namespace TWTodos.Controllers
         {
             if (await _context.Usuarios.AnyAsync(u => u.LoginUsuario == usuario.LoginUsuario))
             {
-                return Conflict("Email ou login j� est� em uso.");
+                return Conflict("Login já está em uso.");
             }
 
             _context.Usuarios.Add(usuario);
@@ -57,7 +57,7 @@ namespace TWTodos.Controllers
         public async Task<IActionResult> UploadFoto([FromForm] IFormFile imagem, [FromForm] int usuarioID)
         {
             if (imagem == null || imagem.Length == 0)
-                return BadRequest("Imagem inv�lida.");
+                return BadRequest("Imagem inválida.");
 
             var nomeArquivo = Guid.NewGuid().ToString() + Path.GetExtension(imagem.FileName);
             var caminhoUploads = Path.Combine(_env.WebRootPath, "uploads");
@@ -76,7 +76,7 @@ namespace TWTodos.Controllers
 
             var usuario = await _context.Usuarios.FindAsync(usuarioID);
             if (usuario == null)
-                return NotFound("Usu�rio n�o encontrado.");
+                return NotFound("Usuário não encontrado.");
 
             usuario.FotoPerfilURL = urlRelativa;
             await _context.SaveChangesAsync();
