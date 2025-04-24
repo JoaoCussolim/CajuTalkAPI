@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TWTodos.Data;
 using TWTodos.Models;
+using TWTodos.DTOs;
 using System.IO; // Required for Path operations
 using Microsoft.AspNetCore.Hosting; // Required for IWebHostEnvironment
 using System; // Required for Guid
@@ -31,63 +32,81 @@ namespace TWTodos.Controllers
         // POST /usuarios
         // Creates a new user with a default profile picture
         [HttpPost]
-        public async Task<IActionResult> CriarUsuario([FromBody] Usuario usuario)
+        public async Task<IActionResult> CriarUsuario([FromBody] UsuarioCreateDto usuarioDto)
         {
-            if (string.IsNullOrWhiteSpace(usuario.NomeUsuario) || string.IsNullOrWhiteSpace(usuario.LoginUsuario) || string.IsNullOrWhiteSpace(usuario.SenhaHash))
-            {
-                return BadRequest("Nome, Login e Senha são obrigatórios.");
-            }
-
-            if (await _context.Usuarios.AnyAsync(u => u.LoginUsuario == usuario.LoginUsuario))
+            if (await _context.Usuarios.AnyAsync(u => u.LoginUsuario == usuarioDto.LoginUsuario))
             {
                 return Conflict("Login já está em uso.");
             }
 
-            usuario.FotoPerfilURL = DefaultProfilePicUrl;
+            // *** Mapeamento Manual do DTO para a Entidade ***
+            var usuario = new Usuario
+            {
+                NomeUsuario = usuarioDto.NomeUsuario,
+                LoginUsuario = usuarioDto.LoginUsuario,
+                FotoPerfilURL = DefaultProfilePicUrl // Pega o padrão
+                // SenhaHash será definida abaixo
+            };
 
-            // *** Hash the password before saving ***
-            // The first parameter (usuario) is optional here but required by the interface contract.
-            // It's used by Identity for potential user-specific hashing upgrades, but not strictly needed for basic hashing.
-            usuario.SenhaHash = _passwordHasher.HashPassword(usuario, usuario.SenhaHash);
+            usuario.SenhaHash = _passwordHasher.HashPassword(usuario, usuarioDto.SenhaUsuario);
+            usuario.CorFundo = "255250250";
 
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
+            // *** Mapeamento da Entidade para o DTO de Resposta ***
+            var usuarioResultDto = new UsuarioDto
+            {
+                ID = usuario.ID,
+                NomeUsuario = usuario.NomeUsuario,
+                LoginUsuario = usuario.LoginUsuario,
+                FotoPerfilURL = usuario.FotoPerfilURL,
+                CorFundo = usuario.CorFundo
+            };
 
-            // IMPORTANT: Do NOT return the hashed password in the response.
-            // Create a DTO (Data Transfer Object) for responses.
-            // For simplicity now, we return the object but clear the sensitive field.
-            usuario.SenhaHash = null; // Clear password before returning
-
-            return CreatedAtAction(nameof(ObterPorId), new { id = usuario.ID }, usuario);
+            // Retorna o DTO de resposta
+            return CreatedAtAction(nameof(ObterPorId), new { id = usuarioResultDto.ID }, usuarioResultDto);
         }
 
         // GET /usuarios
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> ObterTodos()
         {
-            // Consider projecting to a DTO to avoid exposing sensitive data like passwords
-            return await _context.Usuarios.ToListAsync();
+            var usuariosDto = await _context.Usuarios
+                .Select(u => new UsuarioDto // Mapeia para o DTO
+                {
+                    ID = u.ID,
+                    NomeUsuario = u.NomeUsuario,
+                    LoginUsuario = u.LoginUsuario,
+                    FotoPerfilURL = u.FotoPerfilURL
+                })
+                .ToListAsync();
+
+            return Ok(usuariosDto); // Retorna a lista de DTOs
         }
 
         // GET /usuarios/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Usuario>> ObterPorId(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
+            var usuarioDto = await _context.Usuarios
+                .Where(u => u.ID == id)
+                .Select(u => new UsuarioDto // Mapeia para o DTO
+                {
+                    ID = u.ID,
+                    NomeUsuario = u.NomeUsuario,
+                    LoginUsuario = u.LoginUsuario,
+                    FotoPerfilURL = u.FotoPerfilURL
+                })
+                .FirstOrDefaultAsync();
 
-            if (usuario == null)
+            if (usuarioDto == null)
                 return NotFound();
 
-            // Consider projecting to a DTO
-            return usuario;
+            return Ok(usuarioDto); // Retorna o DTO encontrado
         }
 
-        // PUT /usuarios/{id}
-        // Updates user information, optionally including a new profile picture
         [HttpPut("{id}")]
-        // We use [FromForm] because we might receive a file (multipart/form-data)
-        // Create a specific DTO for updates is recommended practice
-        public async Task<IActionResult> AtualizarUsuario(int id, [FromForm] UsuarioUpdateModel updateModel)
+        public async Task<IActionResult> AtualizarUsuario(int id, [FromForm] UsuarioUpdateDto updateDto)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
 
@@ -97,30 +116,30 @@ namespace TWTodos.Controllers
             }
 
             // Check for login conflict only if the login is being changed
-            if (!string.IsNullOrWhiteSpace(updateModel.LoginUsuario) &&
-                updateModel.LoginUsuario != usuario.LoginUsuario &&
-                await _context.Usuarios.AnyAsync(u => u.LoginUsuario == updateModel.LoginUsuario && u.ID != id))
+            if (!string.IsNullOrWhiteSpace(updateDto.LoginUsuario) &&
+                updateDto.LoginUsuario != usuario.LoginUsuario &&
+                await _context.Usuarios.AnyAsync(u => u.LoginUsuario == updateDto.LoginUsuario && u.ID != id))
             {
                 return Conflict("Login já está em uso por outro usuário.");
             }
 
             // Update properties if provided in the model
-            if (!string.IsNullOrWhiteSpace(updateModel.NomeUsuario))
+            if (!string.IsNullOrWhiteSpace(updateDto.NomeUsuario))
             {
-                usuario.NomeUsuario = updateModel.NomeUsuario;
+                usuario.NomeUsuario = updateDto.NomeUsuario;
             }
-            if (!string.IsNullOrWhiteSpace(updateModel.LoginUsuario))
+            if (!string.IsNullOrWhiteSpace(updateDto.LoginUsuario))
             {
-                usuario.LoginUsuario = updateModel.LoginUsuario;
+                usuario.LoginUsuario = updateDto.LoginUsuario;
             }
-            if (!string.IsNullOrWhiteSpace(updateModel.SenhaUsuario))
+            if (!string.IsNullOrWhiteSpace(updateDto.SenhaUsuario))
             {
                 // *** Hash the password IF it's being updated ***
-                usuario.SenhaHash = _passwordHasher.HashPassword(usuario, updateModel.SenhaUsuario);
+                usuario.SenhaHash = _passwordHasher.HashPassword(usuario, updateDto.SenhaUsuario);
             }
 
             // Handle optional photo upload
-            if (updateModel.NovaFotoPerfil != null && updateModel.NovaFotoPerfil.Length > 0)
+            if (updateDto.NovaFotoPerfil != null && updateDto.NovaFotoPerfil.Length > 0)
             {
                 // Delete old photo if it's not the default one
                 if (!string.IsNullOrEmpty(usuario.FotoPerfilURL) && usuario.FotoPerfilURL != DefaultProfilePicUrl)
@@ -131,7 +150,7 @@ namespace TWTodos.Controllers
                 // Save new photo and update URL
                 try
                 {
-                    usuario.FotoPerfilURL = await SaveFileAsync(updateModel.NovaFotoPerfil);
+                    usuario.FotoPerfilURL = await SaveFileAsync(updateDto.NovaFotoPerfil);
                 }
                 catch (Exception ex)
                 {
@@ -158,9 +177,7 @@ namespace TWTodos.Controllers
                 }
             }
 
-            // Return NoContent or the updated user (projected to DTO)
-            return NoContent(); // Standard REST response for successful PUT
-            // Or return Ok(usuario); // If you want to return the updated object
+            return Ok(usuario); // Standard REST response for successful PUT
         }
 
 
@@ -222,18 +239,6 @@ namespace TWTodos.Controllers
         private async Task<bool> UsuarioExists(int id)
         {
             return await _context.Usuarios.AnyAsync(e => e.ID == id);
-        }
-
-        // *** Define a specific model for the update payload ***
-        // This is better practice than reusing the main Usuario model directly
-        public class UsuarioUpdateModel
-        {
-            public string? NomeUsuario { get; set; } // Nullable allows partial updates
-            public string? LoginUsuario { get; set; }
-            public string? SenhaUsuario { get; set; } // Handle password updates carefully
-            public IFormFile? NovaFotoPerfil { get; set; } // Optional new photo
-             // Don't include ID here, it comes from the route
-             // Don't include FotoPerfilURL here, it's handled internally if NovaFotoPerfil is provided
         }
     }
 }
