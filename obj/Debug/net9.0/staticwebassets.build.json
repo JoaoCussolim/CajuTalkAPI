@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "6ppAHg5ZJwwu18E3SasyQzL7o2SFhCOwiHA1WkENRHs=",
+  "Hash": "PG09otVS7y3XgcWRZDkt1/qGnczm/NmjB+L/QYjuYvQ=",
   "Source": "CajuTalkAPI",
   "BasePath": "_content/CajuTalkAPI",
   "Mode": "Default",
@@ -10,17 +10,80 @@
     {
       "Name": "CajuTalkAPI\\wwwroot",
       "Source": "CajuTalkAPI",
-      "ContentRoot": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\",
       "BasePath": "_content/CajuTalkAPI",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "Identity": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\4402c6b9-05b0-484e-b782-2f83eeac265b.jpg",
       "SourceId": "CajuTalkAPI",
       "SourceType": "Discovered",
-      "ContentRoot": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\",
+      "ContentRoot": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\",
+      "BasePath": "_content/CajuTalkAPI",
+      "RelativePath": "uploads/4402c6b9-05b0-484e-b782-2f83eeac265b#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "g9w44alldz",
+      "Integrity": "rAfL2i/muZTCGo36iNLWXu5v9g+U6B827NJQQRWXMVQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\4402c6b9-05b0-484e-b782-2f83eeac265b.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\490686f9-3823-439d-9532-2061115b88d4.jpg",
+      "SourceId": "CajuTalkAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\",
+      "BasePath": "_content/CajuTalkAPI",
+      "RelativePath": "uploads/490686f9-3823-439d-9532-2061115b88d4#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "v410cel4et",
+      "Integrity": "QSbQ3zA+Ym6EOs+gR2+7LRRiaVsSXRFobbzDn8ArZNI=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\490686f9-3823-439d-9532-2061115b88d4.jpg"
+    },
+    {
+      "Identity": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\default-profile.png",
+      "SourceId": "CajuTalkAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\",
+      "BasePath": "_content/CajuTalkAPI",
+      "RelativePath": "uploads/default-profile#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "a522o1khwd",
+      "Integrity": "okyZHkeZIQyTN2JujtOvJ4e0/vhgQ7I2NxM1QPP+eHk=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\uploads\\default-profile.png"
+    },
+    {
+      "Identity": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "SourceId": "CajuTalkAPI",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\",
       "BasePath": "_content/CajuTalkAPI",
       "RelativePath": "uploads/sungjinwoo#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
@@ -40,8 +103,254 @@
   ],
   "Endpoints": [
     {
+      "Route": "uploads/4402c6b9-05b0-484e-b782-2f83eeac265b.g9w44alldz.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\4402c6b9-05b0-484e-b782-2f83eeac265b.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "125246"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"rAfL2i/muZTCGo36iNLWXu5v9g+U6B827NJQQRWXMVQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 15:05:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "g9w44alldz"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/4402c6b9-05b0-484e-b782-2f83eeac265b.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-rAfL2i/muZTCGo36iNLWXu5v9g+U6B827NJQQRWXMVQ="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/4402c6b9-05b0-484e-b782-2f83eeac265b.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\4402c6b9-05b0-484e-b782-2f83eeac265b.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "125246"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"rAfL2i/muZTCGo36iNLWXu5v9g+U6B827NJQQRWXMVQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 15:05:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-rAfL2i/muZTCGo36iNLWXu5v9g+U6B827NJQQRWXMVQ="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/490686f9-3823-439d-9532-2061115b88d4.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\490686f9-3823-439d-9532-2061115b88d4.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "126888"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QSbQ3zA+Ym6EOs+gR2+7LRRiaVsSXRFobbzDn8ArZNI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 14:59:03 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-QSbQ3zA+Ym6EOs+gR2+7LRRiaVsSXRFobbzDn8ArZNI="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/490686f9-3823-439d-9532-2061115b88d4.v410cel4et.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\490686f9-3823-439d-9532-2061115b88d4.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "126888"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"QSbQ3zA+Ym6EOs+gR2+7LRRiaVsSXRFobbzDn8ArZNI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 07 Apr 2025 14:59:03 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "v410cel4et"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/490686f9-3823-439d-9532-2061115b88d4.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-QSbQ3zA+Ym6EOs+gR2+7LRRiaVsSXRFobbzDn8ArZNI="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/default-profile.a522o1khwd.png",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\default-profile.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "50888"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"okyZHkeZIQyTN2JujtOvJ4e0/vhgQ7I2NxM1QPP+eHk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Apr 2025 13:17:20 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "a522o1khwd"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/default-profile.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-okyZHkeZIQyTN2JujtOvJ4e0/vhgQ7I2NxM1QPP+eHk="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/default-profile.png",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\default-profile.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "50888"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"okyZHkeZIQyTN2JujtOvJ4e0/vhgQ7I2NxM1QPP+eHk=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Apr 2025 13:17:20 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-okyZHkeZIQyTN2JujtOvJ4e0/vhgQ7I2NxM1QPP+eHk="
+        }
+      ]
+    },
+    {
       "Route": "uploads/sungjinwoo.5jhnela5po.jpg",
-      "AssetFile": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -86,7 +395,7 @@
     },
     {
       "Route": "uploads/sungjinwoo.jpg",
-      "AssetFile": "C:\\Users\\u24136\\Desktop\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
+      "AssetFile": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\wwwroot\\uploads\\sungjinwoo.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
