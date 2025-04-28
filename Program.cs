@@ -1,26 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using TWTodos.Data;
-using TWTodos.Services; // Add this
-using Microsoft.AspNetCore.Authentication.JwtBearer; // Add this
-using Microsoft.IdentityModel.Tokens; // Add this
-using System.Text; // Add this
-using Microsoft.AspNetCore.Identity; // For IPasswordHasher, PasswordHasher
-using TWTodos.Models;             // For Usuario (Adjust if your namespace is different)
-using TWTodos.Data;               // For CajuTalkContext (Likely needed for AddDbContext)
-using TWTodos.Services;           // For ITokenService, TokenService
-using Microsoft.AspNetCore.Authentication.JwtBearer; // For JWT Authentication setup
-using Microsoft.IdentityModel.Tokens; // For SymmetricSecurityKey, TokenValidationParameters
-using System.Text;                // For Encoding
-// Add other necessary usings like Microsoft.EntityFrameworkCore
+using TWTodos.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Identity;
+using TWTodos.Models;            
+using TWTodos.Data;              
+using TWTodos.Services;           
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;              
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ... other builder setup ...
-
-// *** Register ITokenService ***
 builder.Services.AddScoped<ITokenService, TokenService>();
 
-// *** Configure JWT Authentication (Needed for validating tokens later) ***
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -36,7 +31,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Add Authorization services (usually added by default, but ensure it's there)
 builder.Services.AddAuthorization();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -50,9 +44,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
 var app = builder.Build();
-
+app.UseRouting();
 app.UseStaticFiles();
-
+app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

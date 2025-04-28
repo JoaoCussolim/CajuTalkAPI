@@ -10,7 +10,7 @@ namespace TWTodos.Data
 
         public DbSet<Usuario> Usuarios { get; set; }            // cria a variavel que representa a tabela Usuarios 
         public DbSet<SalaChat> SalasChat { get; set; }          // cria a variavel que representa a tabela SalasChat
-        public DbSet<UsuarioSala> UsuariosSala { get; set; }    // cria a variavel que representa a tabela UsuariosSala
+        public DbSet<UsuarioSala> UsuarioSala { get; set; }    // cria a variavel que representa a tabela UsuariosSala
         public DbSet<Mensagem> Mensagens { get; set; }          // cria a variavel que representa a tabela Mensagens
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
