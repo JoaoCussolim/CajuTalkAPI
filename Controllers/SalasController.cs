@@ -193,52 +193,47 @@
             }
 
 
-            // --- Rota DELETE para excluir uma sala ---
             [HttpDelete("{id}")]
-            [Authorize] // Apenas usuários autenticados podem tentar deletar
+            [Authorize]
             public async Task<IActionResult> DeletarSala(int id)
             {
-                // 1. Obter o ID do usuário requisitante
-                if (!TryGetUserId(out int requestingUserId))
-                {
-                    return Unauthorized("Usuário não identificado.");
-                }
+                if (!TryGetUserId(out int requestingUserId)) { /* ... */ }
 
-                // 2. Encontrar a sala a ser deletada
                 var sala = await _context.SalasChat.FindAsync(id);
                 if (sala == null)
                 {
-                    return NotFound($"Sala com ID {id} não encontrada.");
+                    return NotFound($"Sala com ID {id} não encontrada (ou já foi deletada).");
                 }
 
-                // 3. Verificar permissão (APENAS o criador pode deletar)
-                if (sala.CriadorID != requestingUserId)
-                {
-                    return Forbid("Apenas o criador pode deletar esta sala."); // 403 Forbidden
-                }
+                if (sala.CriadorID != requestingUserId) { /* ... */ }
 
-                // 4. Encontrar e preparar para remover todas as relações UsuarioSala associadas
-                // Isso expulsa/remove todos os usuários da sala no banco de dados
-                var relacoesParaRemover = await _context.UsuarioSala
-                    .Where(us => us.ID_Sala == id)
-                    .ToListAsync();
-
-                if (relacoesParaRemover.Any()) // Se existem relações
-                {
-                    _context.UsuarioSala.RemoveRange(relacoesParaRemover);
-                }
-
-                // 5. Preparar para remover a sala em si
                 _context.SalasChat.Remove(sala);
 
-                // 6. Salvar todas as alterações (remoção das relações e da sala)
-                // EF Core geralmente envolve isso em uma transação implícita
-                await _context.SaveChangesAsync();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    return NoContent(); // Success
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    Console.WriteLine($"Concurrency exception deleting Sala ID {id}: {ex.Message}");
 
-                // 7. Retornar sucesso
-                return NoContent(); // 204 No Content é a resposta padrão para DELETE bem-sucedido
+                    var exists = await _context.SalasChat.AnyAsync(s => s.ID == id);
+                    if (!exists)
+                    {
+                        return NoContent();
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status500InternalServerError, "Erro de concorrência inesperado ao deletar sala.");
+                    }
+
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    Console.WriteLine($"Database error deleting Sala ID {id}: {dbEx.ToString()}");
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Erro no banco de dados ao deletar sala.");
+                }
             }
-
-            // --- (Outros métodos como PUT para atualizar sala poderiam ser adicionados aqui) ---
         }
     }
