@@ -106,7 +106,7 @@ namespace TWTodos.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarUsuario(int id, [FromForm] UsuarioUpdateDto updateDto)
+        public async Task<IActionResult> AtualizarUsuario(int id, [FromBody] UsuarioUpdateDto updateDto)
         {
             var usuario = await _context.Usuarios.FindAsync(id);
 
@@ -150,7 +150,7 @@ namespace TWTodos.Controllers
                 // Save new photo and update URL
                 try
                 {
-                    usuario.FotoPerfilURL = await SaveFileAsync(updateDto.NovaFotoPerfil);
+                    usuario.FotoPerfilURL = updateDto.NovaFotoPerfil;
                 }
                 catch (Exception ex)
                 {
@@ -180,7 +180,7 @@ namespace TWTodos.Controllers
             return Ok(usuario); // Standard REST response for successful PUT
         }
 
-
+        // Não usado por enquanto ----
         // Helper method to save uploaded file
         private async Task<string> SaveFileAsync(IFormFile file)
         {
@@ -206,6 +206,7 @@ namespace TWTodos.Controllers
             // Return the relative path accessible by the web server
             return "/uploads/" + uniqueFileName;
         }
+        // ----
 
         // Helper method to delete a file
         private void DeleteFile(string relativePath)
