@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj": {}
+    "C:\\Users\\u24121\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj": {
+    "C:\\Users\\u24121\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj",
+        "projectUniqueName": "C:\\Users\\u24121\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj",
         "projectName": "CajuTalkAPI",
-        "projectPath": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj",
-        "packagesPath": "C:\\Users\\u24136\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\u24136\\Documents\\GitHub\\CajuTalkAPI\\obj\\",
+        "projectPath": "C:\\Users\\u24121\\Documents\\GitHub\\CajuTalkAPI\\CajuTalkAPI.csproj",
+        "packagesPath": "C:\\Users\\u24121\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\u24121\\Documents\\GitHub\\CajuTalkAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\u24136\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\u24121\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
