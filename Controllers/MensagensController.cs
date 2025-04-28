@@ -46,28 +46,28 @@ namespace TWTodos.Controllers
             }
 
             // 2. Verificar se a sala existe
-            var salaExiste = await _context.SalasChat.AnyAsync(s => s.ID == MensagemCreateDto.SalaId);
+            var salaExiste = await _context.SalasChat.AnyAsync(s => s.ID == MensagemCreateDto.IDSala);
             if (!salaExiste)
             {
-                return NotFound($"Sala com ID {MensagemCreateDto.SalaId} não encontrada.");
+                return NotFound($"Sala com ID {MensagemCreateDto.IDSala} não encontrada.");
             }
 
             // 3. Verificar se o remetente pertence à sala e não está banido
             //    (essencial para segurança!)
             bool podeEnviar = await _context.UsuarioSala
-                .AnyAsync(us => us.ID_Sala == MensagemCreateDto.SalaId &&
+                .AnyAsync(us => us.ID_Sala == MensagemCreateDto.IDSala &&
                                 us.ID_Usuario == remetenteId &&
                                 !us.UsuarioBanido); // Não pode estar banido
             if (!podeEnviar)
             {
-                return Forbid($"Você não tem permissão para enviar mensagens na sala {MensagemCreateDto.SalaId} (não é membro ou está banido).");
+                return Forbid($"Você não tem permissão para enviar mensagens na sala {MensagemCreateDto.IDSala} (não é membro ou está banido).");
             }
 
 
             // 4. Mapear DTO para Entidade
             var mensagem = new Mensagem
             {
-                ID_Sala = MensagemCreateDto.SalaId,
+                ID_Sala = MensagemCreateDto.IDSala,
                 ID_Usuario = remetenteId, // ID do usuário logado
                 Conteudo = MensagemCreateDto.Conteudo,
                 TipoMensagem = MensagemCreateDto.TipoMensagem,
