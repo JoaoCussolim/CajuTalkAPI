@@ -29,44 +29,6 @@ namespace TWTodos.Controllers
             _passwordHasher = passwordHasher;
         }
 
-        // POST /usuarios
-        // Creates a new user with a default profile picture
-        [HttpPost]
-        public async Task<IActionResult> CriarUsuario([FromBody] UsuarioCreateDto usuarioDto)
-        {
-            if (await _context.Usuarios.AnyAsync(u => u.LoginUsuario == usuarioDto.LoginUsuario))
-            {
-                return Conflict("Login já está em uso.");
-            }
-
-            // *** Mapeamento Manual do DTO para a Entidade ***
-            var usuario = new Usuario
-            {
-                NomeUsuario = usuarioDto.NomeUsuario,
-                LoginUsuario = usuarioDto.LoginUsuario,
-                FotoPerfilURL = DefaultProfilePicUrl // Pega o padrão
-                // SenhaHash será definida abaixo
-            };
-
-            usuario.SenhaHash = _passwordHasher.HashPassword(usuario, usuarioDto.SenhaUsuario);
-            usuario.CorFundo = "255250250";
-
-            _context.Usuarios.Add(usuario);
-            await _context.SaveChangesAsync();
-            // *** Mapeamento da Entidade para o DTO de Resposta ***
-            var usuarioResultDto = new UsuarioDto
-            {
-                ID = usuario.ID,
-                NomeUsuario = usuario.NomeUsuario,
-                LoginUsuario = usuario.LoginUsuario,
-                FotoPerfilURL = usuario.FotoPerfilURL,
-                CorFundo = usuario.CorFundo
-            };
-
-            // Retorna o DTO de resposta
-            return CreatedAtAction(nameof(ObterPorId), new { id = usuarioResultDto.ID }, usuarioResultDto);
-        }
-
         // GET /usuarios
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Usuario>>> ObterTodos()

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TWTodos.Models
 {
-    // Tabela Usuário do Esquema CajuTalk
+    // Tabela Usuï¿½rio do Esquema CajuTalk
     [Table("Usuario", Schema = "CajuTalk")]
     // Classe da Tabela Usuario
     public class Usuario
@@ -14,5 +14,7 @@ namespace TWTodos.Models
         public string SenhaHash { get; set; }
         public string? FotoPerfilURL { get; set; }
         public string? CorFundo { get; set; }
+
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

@@ -43,14 +43,17 @@ namespace TWTodos.Services
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256Signature); // Or HmacSha512 if key is long enough
 
             // 3. Define Token Descriptor
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpiryInMinutes"])),
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"],
-                SigningCredentials = creds
-            };
+                    
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            // CORRIJA ESTA LINHA: Use "AccessTokenExpirationMinutes"
+            Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpirationMinutes"] ?? "15")), // Adicionar fallback é bom
+            Issuer = _configuration["Jwt:Issuer"],
+            Audience = _configuration["Jwt:Audience"],
+            SigningCredentials = creds
+            // NotBefore pode ser omitido, ele geralmente assume um valor padrão razoável (agora).
+        };
 
             // 4. Create Token Handler and Generate Token
             var tokenHandler = new JwtSecurityTokenHandler();
