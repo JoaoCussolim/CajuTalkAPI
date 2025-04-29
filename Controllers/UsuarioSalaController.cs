@@ -38,7 +38,7 @@ namespace TWTodos.Controllers
         }
 
         // --- Entrar em uma Sala ---
-        [HttpPost("entrar")] // POST /api/usuariosala/entrar
+        [HttpPost("entrar")] // POST /usuariosala/entrar
         public async Task<IActionResult> EntrarSala([FromBody] EntrarSalaDto entrarDto)
         {
             if (!TryGetUserId(out int userId))

@@ -57,10 +57,10 @@ namespace TWTodos.Controllers
             bool podeEnviar = await _context.UsuarioSala
                 .AnyAsync(us => us.ID_Sala == MensagemCreateDto.IDSala &&
                                 us.ID_Usuario == remetenteId &&
-                                !us.UsuarioBanido); // Não pode estar banido
+                                !us.UsuarioBanido);
             if (!podeEnviar)
             {
-                return Forbid($"Você não tem permissão para enviar mensagens na sala {MensagemCreateDto.IDSala} (não é membro ou está banido).");
+                return Forbid();
             }
 
 
@@ -134,7 +134,7 @@ namespace TWTodos.Controllers
                  // Ou talvez permitir ler se a sala for pública? Decisão de negócio.
                  // var sala = await _context.SalasChat.FindAsync(idSala);
                  // if (sala == null || !sala.Publica) {
-                      return Forbid($"Você não tem permissão para ler mensagens na sala {idSala} (não é membro ou está banido).");
+                      return Forbid();
                  // }
             }
 

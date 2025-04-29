@@ -193,14 +193,16 @@ namespace TWTodos.Controllers
                 Expires = DateTime.UtcNow.AddDays(refreshTokenValidityDays),
                 Created = DateTime.UtcNow,
                 UsuarioId = usuarioId
-                // Revoked é null por padrão
             };
         }
 
         private async Task RemoveOldRefreshTokens(int usuarioId, int keepActiveCount = 5)
         {
+            var now = DateTime.UtcNow; // Pega o tempo atual uma vez para consistência
+
             var inactiveTokens = await _context.RefreshTokens
-                .Where(rt => rt.UsuarioId == usuarioId && !rt.IsActive)
+                .Where(rt => rt.UsuarioId == usuarioId &&
+                            (rt.Revoked != null || rt.Expires <= now)) // Verifica se Revoked NÃO é nulo OU se Expires JÁ passou
                 .ToListAsync();
 
             if (inactiveTokens.Any())
@@ -208,15 +210,23 @@ namespace TWTodos.Controllers
                 _context.RefreshTokens.RemoveRange(inactiveTokens);
             }
 
-            var activeTokens = await _context.RefreshTokens
-                .Where(rt => rt.UsuarioId == usuarioId && rt.IsActive)
-                .OrderByDescending(rt => rt.Created)
-                .ToListAsync();
+            var activeTokensQuery = _context.RefreshTokens
+                .Where(rt => rt.UsuarioId == usuarioId &&
+                            rt.Revoked == null && rt.Expires > now);
 
-            if (activeTokens.Count > keepActiveCount)
+            var activeTokensCount = await activeTokensQuery.CountAsync();
+
+            if (activeTokensCount > keepActiveCount)
             {
-                var tokensToRemove = activeTokens.Skip(keepActiveCount).ToList();
-                _context.RefreshTokens.RemoveRange(tokensToRemove);
+                var tokensToRemove = await activeTokensQuery
+                    .OrderBy(rt => rt.Created) // Ordena pelos mais antigos primeiro
+                    .Take(activeTokensCount - keepActiveCount) // Pega a quantidade excedente
+                    .ToListAsync();
+
+                if (tokensToRemove.Any())
+                {
+                    _context.RefreshTokens.RemoveRange(tokensToRemove);
+                }
             }
         }
     }

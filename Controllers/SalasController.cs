@@ -132,55 +132,68 @@ namespace TWTodos.Controllers
                 }
             }
 
-        // --- Rota POST para criar salas ---
-        // Requer que o usuário esteja autenticado para criar uma sala.
         [HttpPost]
-        [Authorize] // Garante que apenas usuários logados podem chamar este endpoint
+        [Authorize]
         public async Task<IActionResult> CriarSala([FromBody] SalaCreateDto SalaCreateDto)
         {
-            // 1. Obter o ID do Criador a partir do token (Claim)
+            // 1. Obter o ID do Criador (como antes)
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null)
             {
-                // Embora [Authorize] deva prevenir isso, é uma boa verificação.
                 return Unauthorized("Claim de identificador do usuário não encontrado no token.");
             }
-
             if (!int.TryParse(userIdClaim.Value, out int criadorId))
             {
                 return BadRequest("O formato do ID do usuário no token é inválido.");
             }
 
-            // 2. Validação Adicional (Exemplo: Senha obrigatória para sala privada)
+            // 2. Validação Adicional (como antes)
             if (!SalaCreateDto.Publica && string.IsNullOrWhiteSpace(SalaCreateDto.Senha))
             {
                 ModelState.AddModelError(nameof(SalaCreateDto.Senha), "Uma senha é obrigatória para salas privadas.");
-                return ValidationProblem(ModelState); // Retorna 400 Bad Request com detalhes do erro
+                return ValidationProblem(ModelState);
             }
-
-            // Garante que salas públicas não tenham senha armazenada
             if (SalaCreateDto.Publica && !string.IsNullOrWhiteSpace(SalaCreateDto.Senha))
             {
                 SalaCreateDto.Senha = null;
             }
 
-
-            // 3. Mapear DTO para Entidade
+            // 3. Mapear DTO para Entidade SalaChat (como antes)
             var sala = new SalaChat
             {
                 Nome = SalaCreateDto.Nome,
                 Publica = SalaCreateDto.Publica,
-                // Usar a senha do DTO (que pode ter sido anulada acima se pública)
                 Senha = SalaCreateDto.Senha,
                 FotoPerfilURL = SalaCreateDto.FotoPerfilURL,
-                CriadorID = criadorId // ID obtido do Claim do token
+                CriadorID = criadorId
             };
 
-            // 4. Salvar no Banco de Dados
+            // 4. Salvar a SalaChat no Banco de Dados
             _context.SalasChat.Add(sala);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); // <--- PRIMEIRO SAVE (obtém sala.ID)
 
-            // 5. Mapear Entidade para DTO de Resposta (para não expor a senha)
+            // **** ETAPA ADICIONAL: Adicionar o criador à tabela Usuario_Sala ****
+            try // É bom ter um try-catch aqui para o caso de falha na segunda inserção
+            {
+                var associacaoCriador = new UsuarioSala
+                {
+                    ID_Usuario = criadorId,   // ID do usuário que criou
+                    ID_Sala = sala.ID,        // ID da sala que acabou de ser criada
+                    Criador = true,           // Marca como criador na tabela de associação
+                    UsuarioBanido = false     // Garante que o criador não começa banido
+                };
+                _context.UsuarioSala.Add(associacaoCriador);
+                await _context.SaveChangesAsync(); // <--- SEGUNDO SAVE (salva a associação)
+            }
+            catch (DbUpdateException ex)
+            {
+                // Logar o erro (ex)
+                // Opcional: tentar deletar a sala que foi criada se a associação falhar? (Transação seria melhor)
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao associar o criador à sala após a criação.");
+            }
+            // *****************************************************************
+
+            // 5. Mapear Entidade para DTO de Resposta (como antes)
             var salaDto = new SalaChatDto
             {
                 ID = sala.ID,
@@ -190,11 +203,11 @@ namespace TWTodos.Controllers
                 CriadorID = sala.CriadorID
             };
 
-            // 6. Retornar Resposta 201 Created
-            // O primeiro argumento `nameof(ObterPorId)` cria a URL de localização para o novo recurso.
-            // O segundo argumento são os parâmetros da rota para ObterPorId.
-            // O terceiro argumento é o corpo da resposta (o DTO da sala criada).
-            return CreatedAtAction(nameof(ObterPorId), new { id = sala.ID }, salaDto);
+            // 6. Retornar Resposta 201 Created (como antes)
+            // Se você tiver uma action ObterPorId em SalasController:
+            // return CreatedAtAction(nameof(ObterPorId), new { id = sala.ID }, salaDto);
+            // Se não tiver, pode retornar Ok ou Created com a URL direta:
+            return Created($"/salas/{sala.ID}", salaDto); // Ajuste a URL conforme sua rota GET
         }
 
         // --- Rota GET para obter todas as salas ---
