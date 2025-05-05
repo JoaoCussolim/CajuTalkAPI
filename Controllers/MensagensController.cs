@@ -108,19 +108,19 @@ public class MensagensController : ControllerBase
 
 
         // 3. Verificar se a sala existe e se o usuário pode enviar
-        var salaExiste = await _context.SalasChat.AnyAsync(s => s.ID == mensagemCreateDto.IDSala);
+        var salaExiste = await _context.SalasChat.AnyAsync(s => s.ID == mensagemCreateDto.SalaId);
         if (!salaExiste)
         {
-            return NotFound($"Sala com ID {mensagemCreateDto.IDSala} não encontrada.");
+            return NotFound($"Sala com ID {mensagemCreateDto.SalaId} não encontrada.");
         }
 
         bool podeEnviar = await _context.UsuarioSala
-            .AnyAsync(us => us.ID_Sala == mensagemCreateDto.IDSala &&
+            .AnyAsync(us => us.ID_Sala == mensagemCreateDto.SalaId &&
                             us.ID_Usuario == remetenteId &&
                             !us.UsuarioBanido);
         if (!podeEnviar)
         {
-                _logger.LogWarning("Usuário {UserId} tentou enviar mensagem para sala {SalaId} sem permissão (banido ou não membro).", remetenteId, mensagemCreateDto.IDSala);
+                _logger.LogWarning("Usuário {UserId} tentou enviar mensagem para sala {SalaId} sem permissão (banido ou não membro).", remetenteId, mensagemCreateDto.SalaId);
             return Forbid("Você não tem permissão para enviar mensagens nesta sala.");
         }
 
@@ -136,12 +136,12 @@ public class MensagensController : ControllerBase
                 mediaUrl = await SaveMediaFileAsync(mensagemCreateDto.MediaFile); // Salva o arquivo
             }
             catch (IOException ioEx) {
-                    _logger.LogError(ioEx, "Erro de IO ao salvar arquivo {FileName} para usuário {UserId} na sala {SalaId}", mensagemCreateDto.MediaFile.FileName, remetenteId, mensagemCreateDto.IDSala);
+                    _logger.LogError(ioEx, "Erro de IO ao salvar arquivo {FileName} para usuário {UserId} na sala {SalaId}", mensagemCreateDto.MediaFile.FileName, remetenteId, mensagemCreateDto.SalaId);
                     return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao acessar o armazenamento de arquivos.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro inesperado ao salvar arquivo {FileName} para usuário {UserId} na sala {SalaId}", mensagemCreateDto.MediaFile.FileName, remetenteId, mensagemCreateDto.IDSala);
+                _logger.LogError(ex, "Erro inesperado ao salvar arquivo {FileName} para usuário {UserId} na sala {SalaId}", mensagemCreateDto.MediaFile.FileName, remetenteId, mensagemCreateDto.SalaId);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro interno ao processar o arquivo.");
             }
         }
@@ -149,7 +149,7 @@ public class MensagensController : ControllerBase
         // Mapear para a entidade Mensagem
         var mensagem = new Mensagem
         {
-            ID_Sala = mensagemCreateDto.IDSala,
+            ID_Sala = mensagemCreateDto.SalaId,
             ID_Usuario = remetenteId,
             Conteudo = !isFileType ? mensagemCreateDto.Conteudo : mediaUrl, // Texto ou URL do arquivo
             TipoMensagem = mensagemCreateDto.TipoMensagem,
@@ -191,9 +191,9 @@ public class MensagensController : ControllerBase
         return Ok(mensagemDto);
     }
 
-    // GET /mensagens/sala/{idSala} - Busca mensagens com dados do remetente
-    [HttpGet("sala/{idSala}")]
-    public async Task<ActionResult<IEnumerable<MensagemDto>>> ObterMensagensPorSala(int idSala)
+    // GET /mensagens/sala/{SalaId} - Busca mensagens com dados do remetente
+    [HttpGet("sala/{SalaId}")]
+    public async Task<ActionResult<IEnumerable<MensagemDto>>> ObterMensagensPorSala(int SalaId)
     {
             // 1. Obter ID do usuário requisitante
         if (!TryGetUserId(out int requestingUserId))
@@ -202,26 +202,26 @@ public class MensagensController : ControllerBase
         }
 
         // 2. Verificar se a sala existe
-        var salaExiste = await _context.SalasChat.AnyAsync(s => s.ID == idSala);
+        var salaExiste = await _context.SalasChat.AnyAsync(s => s.ID == SalaId);
         if (!salaExiste)
         {
-            return NotFound($"Sala com ID {idSala} não encontrada.");
+            return NotFound($"Sala com ID {SalaId} não encontrada.");
         }
 
         // 3. Verificar se o usuário pertence à sala para poder ler as mensagens
             bool podeLer = await _context.UsuarioSala
-            .AnyAsync(us => us.ID_Sala == idSala &&
+            .AnyAsync(us => us.ID_Sala == SalaId &&
                             us.ID_Usuario == requestingUserId &&
                             !us.UsuarioBanido); // Não pode estar banido
         if (!podeLer)
         {
-            _logger.LogWarning("Usuário {UserId} tentou ler mensagens da sala {SalaId} sem permissão.", requestingUserId, idSala);
+            _logger.LogWarning("Usuário {UserId} tentou ler mensagens da sala {SalaId} sem permissão.", requestingUserId, SalaId);
             return Forbid("Você não tem permissão para ler mensagens nesta sala.");
         }
 
         // 4. Buscar mensagens e informações do remetente, incluindo NomeArquivoOriginal
         var mensagensDto = await _context.Mensagens
-            .Where(m => m.ID_Sala == idSala)
+            .Where(m => m.ID_Sala == SalaId)
             .OrderBy(m => m.DataEnvio) // Ordena pela data de envio
             .Join( // Junta com Usuarios para pegar nome/foto do remetente
                 _context.Usuarios,
