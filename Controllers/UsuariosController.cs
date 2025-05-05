@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity; // Required for hashing passwords
 using System.Threading.Tasks; // Required for async operations
 using System.Collections.Generic; // Required for IEnumerable
 using System.Linq; // Required for LINQ extension methods like AnyAsync
+using Microsoft.Extensions.Logging;
 
 namespace TWTodos.Controllers
 {
@@ -21,12 +22,14 @@ namespace TWTodos.Controllers
         private readonly IWebHostEnvironment _env;
         private const string DefaultProfilePicUrl = "http://localhost:5109/uploads/default-profile.png";
         private readonly IPasswordHasher<Usuario> _passwordHasher;
+        private readonly ILogger<UsuariosController> _logger;
 
-        public UsuariosController(CajuTalkContext context, IWebHostEnvironment env, IPasswordHasher<Usuario> passwordHasher)
+        public UsuariosController(CajuTalkContext context, IWebHostEnvironment env, IPasswordHasher<Usuario> passwordHasher, ILogger<UsuariosController> logger)
         {
             _context = context;
             _env = env;
             _passwordHasher = passwordHasher;
+            _logger = logger;
         }
 
         // GET /usuarios
@@ -142,6 +145,53 @@ namespace TWTodos.Controllers
             return Ok(usuario); // Standard REST response for successful PUT
         }
 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)] // Sucesso
+        [ProducesResponseType(StatusCodes.Status404NotFound)] // Não encontrado
+        [ProducesResponseType(StatusCodes.Status409Conflict)] // Conflito (FK)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)] // Erro interno
+        public async Task<IActionResult> DeletarUsuario(int id)
+        {
+            var usuario = await _context.Usuarios.FindAsync(id);
+
+            if (usuario == null)
+            {
+                _logger.LogInformation("Tentativa de deletar usuário não existente com ID {UserId}", id);
+                return NotFound($"Usuário com ID {id} não encontrado.");
+            }
+
+            string fotoUrlParaDeletar = usuario.FotoPerfilURL ?? string.Empty; // Guarda a URL antes de remover
+
+            try
+            {
+                _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Usuário com ID {UserId} deletado com sucesso do banco de dados.", id);
+
+                // Tenta deletar a foto de perfil APÓS sucesso no banco
+                // Não deleta a foto default
+                if (!string.IsNullOrEmpty(fotoUrlParaDeletar) && fotoUrlParaDeletar != DefaultProfilePicUrl)
+                {
+                    DeleteFile(fotoUrlParaDeletar); // Usa o helper existente
+                }
+
+                return NoContent(); // Retorno padrão para DELETE bem-sucedido
+            }
+            catch (DbUpdateException dbEx) // Erro ao salvar (provavelmente FK constraint)
+            {
+                // Log detalhado do erro de banco
+                 _logger.LogError(dbEx, "Erro ao deletar usuário ID {UserId} do banco de dados. Possível violação de FK.", id);
+                // Retorna um erro que indica que a operação não pôde ser completada por causa de dependências
+                return Conflict($"Não foi possível deletar o usuário {id}. Pode haver dados associados (mensagens, salas, etc.) que impedem a exclusão.");
+            }
+            catch (Exception ex) // Captura outros erros inesperados
+            {
+                _logger.LogError(ex, "Erro inesperado ao tentar deletar usuário ID {UserId}", id);
+                return StatusCode(500, "Ocorreu um erro interno ao tentar deletar o usuário.");
+            }
+        }
+
         // Não usado por enquanto ----
         // Helper method to save uploaded file
         private async Task<string> SaveFileAsync(IFormFile file)
@@ -171,31 +221,64 @@ namespace TWTodos.Controllers
         // ----
 
         // Helper method to delete a file
-        private void DeleteFile(string relativePath)
+        private void DeleteFile(string relativeOrAbsolutePath)
         {
-            if (string.IsNullOrWhiteSpace(relativePath) || string.IsNullOrWhiteSpace(_env.WebRootPath))
+            if (string.IsNullOrWhiteSpace(relativeOrAbsolutePath) || string.IsNullOrWhiteSpace(_env.WebRootPath))
             {
+                _logger.LogWarning("Tentativa de deletar arquivo com caminho vazio ou WebRootPath não configurado.");
                 return;
             }
 
-             // Remove leading slash if present to correctly combine with WebRootPath
-             var fileName = Path.GetFileName(relativePath); // Or manipulate the path string carefully
-             var fullPath = Path.Combine(_env.WebRootPath, "uploads", fileName); // Assumes files are always in /uploads/
-
+            string fullPath;
             try
             {
+                // Tenta determinar se é URL absoluta ou caminho relativo
+                if (Uri.TryCreate(relativeOrAbsolutePath, UriKind.Absolute, out var uri) && (uri.Scheme == "http" || uri.Scheme == "https"))
+                {
+                    // É uma URL absoluta, extrai o caminho relativo (ex: de http://host/uploads/img.png para /uploads/img.png)
+                    var relativePath = uri.AbsolutePath;
+                    // Remove a barra inicial para combinar corretamente com WebRootPath
+                    relativePath = relativePath.TrimStart('/');
+                        var uploadsFolder = Path.GetDirectoryName(relativePath)?.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).FirstOrDefault() ?? "uploads"; // Tenta pegar a pasta raiz (ex: 'uploads')
+                    var fileName = Path.GetFileName(relativePath);
+                    fullPath = Path.Combine(_env.WebRootPath, uploadsFolder, fileName);
+
+                }
+                else // Assume que é um caminho relativo (ex: /uploads/img.png)
+                {
+                    var relativePath = relativeOrAbsolutePath.TrimStart('/');
+                    var uploadsFolder = Path.GetDirectoryName(relativePath)?.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).FirstOrDefault() ?? "uploads"; // Tenta pegar a pasta raiz (ex: 'uploads')
+                    var fileName = Path.GetFileName(relativePath);
+                    fullPath = Path.Combine(_env.WebRootPath, uploadsFolder, fileName);
+                }
+
+                _logger.LogInformation("Tentando deletar arquivo em: {FilePath}", fullPath);
+
                 if (System.IO.File.Exists(fullPath))
                 {
                     System.IO.File.Delete(fullPath);
+                    _logger.LogInformation("Arquivo deletado com sucesso: {FilePath}", fullPath);
                 }
+                else
+                {
+                    _logger.LogWarning("Arquivo não encontrado para deleção: {FilePath}", fullPath);
+                }
+            }
+            catch (IOException ioEx)
+            {
+                _logger.LogError(ioEx, "Erro de IO ao tentar deletar arquivo {FilePath}", relativeOrAbsolutePath);
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                _logger.LogError(uaEx, "Erro de permissão ao tentar deletar arquivo {FilePath}", relativeOrAbsolutePath);
             }
             catch (Exception ex)
             {
-                 // Log the error (e.g., using ILogger)
-                Console.WriteLine($"Erro ao deletar arquivo '{fullPath}': {ex.Message}");
-                 // Decide if this should halt the operation or just be logged
+                _logger.LogError(ex, "Erro inesperado ao tentar deletar arquivo {FilePath}", relativeOrAbsolutePath);
+                // Dependendo da política, pode querer relançar ou apenas logar
             }
         }
+
 
 
         // Helper method to check if user exists
