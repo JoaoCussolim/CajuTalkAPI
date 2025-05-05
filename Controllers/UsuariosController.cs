@@ -142,53 +142,6 @@ namespace TWTodos.Controllers
             return Ok(usuario); // Standard REST response for successful PUT
         }
 
-        [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeletarUsuario(int id)
-        {
-            var usuario = await _context.Usuarios.FindAsync(id);
-
-            if (usuario == null)
-            {
-                return NotFound("Usuário não encontrado.");
-            }
-
-            string fotoUrlParaDeletar = usuario.FotoPerfilURL; // Store URL before removing entity
-
-            try
-            {
-                _context.Usuarios.Remove(usuario);
-                await _context.SaveChangesAsync();
-
-                // --- File Deletion ---
-                // Attempt to delete the profile picture *after* successful DB deletion
-                // Avoid deleting the default picture
-                if (!string.IsNullOrEmpty(fotoUrlParaDeletar) && fotoUrlParaDeletar != DefaultProfilePicUrl)
-                {
-                    DeleteFile(fotoUrlParaDeletar); // Use the helper method
-                }
-                // --- End File Deletion ---
-
-                return NoContent(); // Standard success response for DELETE
-            }
-            catch (DbUpdateException ex)
-            {
-                // This might happen if there are related records (e.g., posts, comments)
-                // and the database constraints prevent deletion (e.g., ON DELETE RESTRICT).
-                _logger.LogError(ex, "Erro ao deletar usuário {UserId} devido a restrições de banco de dados ou outro problema de update.", id);
-                // You could return a Conflict (409) or BadRequest (400) with a specific message
-                return Conflict($"Não foi possível deletar o usuário {id}. Verifique se existem dados associados a ele.");
-            }
-            catch (Exception ex)
-            {
-                // Catch unexpected errors during DB save or file deletion
-                _logger.LogError(ex, "Erro inesperado ao deletar usuário {UserId}", id);
-                return StatusCode(500, "Erro interno ao tentar deletar o usuário.");
-            }
-        }
-
         // Não usado por enquanto ----
         // Helper method to save uploaded file
         private async Task<string> SaveFileAsync(IFormFile file)

@@ -7,13 +7,12 @@ namespace TWTodos.DTOs
 
         public string Conteudo { get; set; }
         public DateTime DataEnvio { get; set; }
-        public TipoMensagemEnum TipoMensagem { get; set; }
+        public string TipoMensagem { get; set; }
 
         // Informações do Remetente (essenciais)
         public int UsuarioId { get; set; }
         public string LoginUsuario { get; set; }
         public string? FotoPerfilURL {get; set;}
-        public IFormFile? MediaFile { get; set; }
 
     }
 }
