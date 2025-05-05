@@ -132,83 +132,83 @@ namespace TWTodos.Controllers
                 }
             }
 
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> CriarSala([FromBody] SalaCreateDto SalaCreateDto)
-        {
-            // 1. Obter o ID do Criador (como antes)
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            [HttpPost]
+            [Authorize]
+            public async Task<IActionResult> CriarSala([FromBody] SalaCreateDto SalaCreateDto)
             {
-                return Unauthorized("Claim de identificador do usuário não encontrado no token.");
-            }
-            if (!int.TryParse(userIdClaim.Value, out int criadorId))
-            {
-                return BadRequest("O formato do ID do usuário no token é inválido.");
-            }
-
-            // 2. Validação Adicional (como antes)
-            if (!SalaCreateDto.Publica && string.IsNullOrWhiteSpace(SalaCreateDto.Senha))
-            {
-                ModelState.AddModelError(nameof(SalaCreateDto.Senha), "Uma senha é obrigatória para salas privadas.");
-                return ValidationProblem(ModelState);
-            }
-            if (SalaCreateDto.Publica && !string.IsNullOrWhiteSpace(SalaCreateDto.Senha))
-            {
-                SalaCreateDto.Senha = null;
-            }
-
-            // 3. Mapear DTO para Entidade SalaChat (como antes)
-            var sala = new SalaChat
-            {
-                Nome = SalaCreateDto.Nome,
-                Publica = SalaCreateDto.Publica,
-                Senha = SalaCreateDto.Senha,
-                FotoPerfilURL = SalaCreateDto.FotoPerfilURL,
-                CriadorID = criadorId
-            };
-
-            // 4. Salvar a SalaChat no Banco de Dados
-            _context.SalasChat.Add(sala);
-            await _context.SaveChangesAsync(); // <--- PRIMEIRO SAVE (obtém sala.ID)
-
-            // **** ETAPA ADICIONAL: Adicionar o criador à tabela Usuario_Sala ****
-            try // É bom ter um try-catch aqui para o caso de falha na segunda inserção
-            {
-                var associacaoCriador = new UsuarioSala
+                // 1. Obter o ID do Criador (como antes)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
                 {
-                    ID_Usuario = criadorId,   // ID do usuário que criou
-                    ID_Sala = sala.ID,        // ID da sala que acabou de ser criada
-                    Criador = true,           // Marca como criador na tabela de associação
-                    UsuarioBanido = false     // Garante que o criador não começa banido
+                    return Unauthorized("Claim de identificador do usuário não encontrado no token.");
+                }
+                if (!int.TryParse(userIdClaim.Value, out int criadorId))
+                {
+                    return BadRequest("O formato do ID do usuário no token é inválido.");
+                }
+
+                // 2. Validação Adicional (como antes)
+                if (!SalaCreateDto.Publica && string.IsNullOrWhiteSpace(SalaCreateDto.Senha))
+                {
+                    ModelState.AddModelError(nameof(SalaCreateDto.Senha), "Uma senha é obrigatória para salas privadas.");
+                    return ValidationProblem(ModelState);
+                }
+                if (SalaCreateDto.Publica && !string.IsNullOrWhiteSpace(SalaCreateDto.Senha))
+                {
+                    SalaCreateDto.Senha = null;
+                }
+
+                // 3. Mapear DTO para Entidade SalaChat (como antes)
+                var sala = new SalaChat
+                {
+                    Nome = SalaCreateDto.Nome,
+                    Publica = SalaCreateDto.Publica,
+                    Senha = SalaCreateDto.Senha,
+                    FotoPerfilURL = SalaCreateDto.FotoPerfilURL,
+                    CriadorID = criadorId
                 };
-                _context.UsuarioSala.Add(associacaoCriador);
-                await _context.SaveChangesAsync(); // <--- SEGUNDO SAVE (salva a associação)
-            }
-            catch (DbUpdateException ex)
-            {
-                // Logar o erro (ex)
-                // Opcional: tentar deletar a sala que foi criada se a associação falhar? (Transação seria melhor)
-                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao associar o criador à sala após a criação.");
-            }
-            // *****************************************************************
 
-            // 5. Mapear Entidade para DTO de Resposta (como antes)
-            var salaDto = new SalaChatDto
-            {
-                ID = sala.ID,
-                Nome = sala.Nome,
-                Publica = sala.Publica,
-                FotoPerfilURL = sala.FotoPerfilURL,
-                CriadorID = sala.CriadorID
-            };
+                // 4. Salvar a SalaChat no Banco de Dados
+                _context.SalasChat.Add(sala);
+                await _context.SaveChangesAsync(); // <--- PRIMEIRO SAVE (obtém sala.ID)
 
-            // 6. Retornar Resposta 201 Created (como antes)
-            // Se você tiver uma action ObterPorId em SalasController:
-            // return CreatedAtAction(nameof(ObterPorId), new { id = sala.ID }, salaDto);
-            // Se não tiver, pode retornar Ok ou Created com a URL direta:
-            return Created($"/salas/{sala.ID}", salaDto); // Ajuste a URL conforme sua rota GET
-        }
+                // **** ETAPA ADICIONAL: Adicionar o criador à tabela Usuario_Sala ****
+                try // É bom ter um try-catch aqui para o caso de falha na segunda inserção
+                {
+                    var associacaoCriador = new UsuarioSala
+                    {
+                        ID_Usuario = criadorId,   // ID do usuário que criou
+                        ID_Sala = sala.ID,        // ID da sala que acabou de ser criada
+                        Criador = true,           // Marca como criador na tabela de associação
+                        UsuarioBanido = false     // Garante que o criador não começa banido
+                    };
+                    _context.UsuarioSala.Add(associacaoCriador);
+                    await _context.SaveChangesAsync(); // <--- SEGUNDO SAVE (salva a associação)
+                }
+                catch (DbUpdateException ex)
+                {
+                    // Logar o erro (ex)
+                    // Opcional: tentar deletar a sala que foi criada se a associação falhar? (Transação seria melhor)
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao associar o criador à sala após a criação.");
+                }
+                // *****************************************************************
+
+                // 5. Mapear Entidade para DTO de Resposta (como antes)
+                var salaDto = new SalaChatDto
+                {
+                    ID = sala.ID,
+                    Nome = sala.Nome,
+                    Publica = sala.Publica,
+                    FotoPerfilURL = sala.FotoPerfilURL,
+                    CriadorID = sala.CriadorID
+                };
+
+                // 6. Retornar Resposta 201 Created (como antes)
+                // Se você tiver uma action ObterPorId em SalasController:
+                // return CreatedAtAction(nameof(ObterPorId), new { id = sala.ID }, salaDto);
+                // Se não tiver, pode retornar Ok ou Created com a URL direta:
+                return Created($"/salas/{sala.ID}", salaDto); // Ajuste a URL conforme sua rota GET
+            }
 
         // --- Rota GET para obter todas as salas ---
         // Permite acesso anônimo (não precisa estar logado).
