@@ -1,18 +1,25 @@
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http; // Necessário para IFormFile
+using System.ComponentModel.DataAnnotations; // Para atributos de validação
+using TWTodos.Models; // Ou onde quer que seu TipoMensagemEnum esteja definido
 
 namespace TWTodos.DTOs
 {
     public class MensagemCreateDto
     {
         [Required(ErrorMessage = "O ID da sala é obrigatório.")]
-        public int IDSala { get; set; } // Renomeado para clareza (mas mapeia para ID_Sala)
+        public int IDSala { get; set; }
 
-        [Required(ErrorMessage = "O conteúdo da mensagem não pode ser vazio.")]
-        [StringLength(2000, ErrorMessage = "A mensagem não pode exceder 2000 caracteres.")]
-        public string Conteudo { get; set; }
+        // O conteúdo é opcional para arquivos, mas obrigatório para texto.
+        // A validação de obrigatoriedade para texto será feita no controller.
+        public string? Conteudo { get; set; }
 
         [Required(ErrorMessage = "O tipo da mensagem é obrigatório.")]
-        [StringLength(50)]
-        public string TipoMensagem { get; set; } = "Texto"; // Valor padrão, se aplicável
+        // Certifique-se que o Enum TipoMensagemEnum está definido e acessível
+        // (ex: em TWTodos.Models ou TWTodos.DTOs)
+        public TipoMensagemEnum TipoMensagem { get; set; }
+
+        // Esta propriedade receberá o arquivo enviado pelo cliente.
+        // É nullable porque mensagens do tipo Texto não terão arquivo.
+        public IFormFile? MediaFile { get; set; }
     }
 }
