@@ -14,5 +14,7 @@ namespace TWTodos.DTOs
         [Required(ErrorMessage = "O tipo da mensagem é obrigatório.")]
         [StringLength(50)]
         public string TipoMensagem { get; set; } = "Texto"; // Valor padrão, se aplicável
+
+        public IFormFile? Arquivo { get; set; }
     }
 }
