@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CajuTalkAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e7a92c6ffc3becda429ae26602dc8151595eced")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+54e38055a1a09e5d253f9cbf54ddb1be48d5d841")]
 [assembly: System.Reflection.AssemblyProductAttribute("CajuTalkAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CajuTalkAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
