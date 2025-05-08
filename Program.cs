@@ -40,6 +40,7 @@ builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
 var app = builder.Build();
 app.UseRouting();
+app.UseCors("AllowAll");
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseHttpsRedirection();
