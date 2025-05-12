@@ -22,7 +22,7 @@ namespace TWTodos.Controllers
         private readonly IPasswordHasher<Usuario> _passwordHasher;
         private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
-        private const string DefaultProfilePicUrl = "http://localhost:5109/uploads/default-profile.png";
+        private const string DefaultProfilePicUrl = "https://cajutalkapi.onrender.com/uploads/default-profile.png";
 
         public AuthController(
             CajuTalkContext context,
