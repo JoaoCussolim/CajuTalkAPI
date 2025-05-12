@@ -1,0 +1,36 @@
+# Arquivo .dockerignore
+
+# Ignorar diretórios de build e dependências locais
+bin/
+obj/
+**/bin/
+**/obj/
+packages/
+node_modules/
+
+# Ignorar arquivos de configuração de IDE e usuário
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Ignorar arquivos de sistema operacional
+Thumbs.db
+.DS_Store
+
+# Ignorar segredos locais e configurações específicas do ambiente (devem ser variáveis de ambiente)
+appsettings.Development.json
+secrets.json
+*.env
+
+# Ignorar diretório do Git
+.git/
+.gitignore
+.gitattributes
+
+# Ignorar saídas de publicação locais
+publish/
+
+# Ignorar Dockerfile e .dockerignore (eles não precisam estar *dentro* da imagem)
+Dockerfile
+.dockerignore
