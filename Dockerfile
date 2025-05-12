@@ -10,14 +10,16 @@ COPY *.sln .
 COPY CajuTalkAPI.csproj .
 
 # Restaurar dependências (referencia o csproj em /source)
-RUN dotnet restore "./CajuTalkAPI.csproj" # <-- CORRIGIDO: Caminho direto
+# <-- CORRIGIDO: Caminho direto
+RUN dotnet restore "./CajuTalkAPI.csproj" 
 
 # Copiar todo o resto do código fonte da raiz do contexto para /source
 COPY . .
 
 # Publicar a aplicação (referencia o csproj em /source)
 # Certifique-se que o WORKDIR ainda é /source
-RUN dotnet publish "./CajuTalkAPI.csproj" -c Release -o /app/publish --no-restore # <-- CORRIGIDO: Caminho direto
+# <-- CORRIGIDO: Caminho direto
+RUN dotnet publish "./CajuTalkAPI.csproj" -c Release -o /app/publish --no-restore
 
 # --- Estágio 2: Runtime ---
 # Use a imagem de runtime ASP.NET Core correspondente
