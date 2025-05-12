@@ -1,40 +1,34 @@
 # --- Estágio 1: Build ---
-# Use a imagem SDK do .NET correspondente à versão do seu projeto (ex: 8.0, 7.0, 6.0)
+# Use a imagem SDK do .NET correspondente à versão do seu projeto (ex: 8.0)
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /source
 
-# Copiar arquivos de projeto/solução primeiro para aproveitar o cache do Docker
-# Ajuste o nome "CajuTalkAPI.csproj" se o seu arquivo .csproj tiver outro nome ou estiver em outra pasta
+# Copiar arquivos de projeto/solução da raiz do contexto
+# O contexto é a pasta onde o Dockerfile está (CAJUTALKAPI/)
 COPY *.sln .
-COPY CajuTalkAPI/*.csproj ./CajuTalkAPI/
-# Adicione linhas COPY extras se tiver outros projetos na solução
+COPY CajuTalkAPI.csproj .  # <-- CORRIGIDO: Copia da raiz para /source
 
-# Restaurar dependências
-RUN dotnet restore "./CajuTalkAPI/CajuTalkAPI.csproj"
-# Se restaurar a solução for mais fácil: RUN dotnet restore "./CajuTalkAPI.sln"
+# Restaurar dependências (referencia o csproj em /source)
+RUN dotnet restore "./CajuTalkAPI.csproj" # <-- CORRIGIDO: Caminho direto
 
-# Copiar todo o resto do código fonte
+# Copiar todo o resto do código fonte da raiz do contexto para /source
 COPY . .
 
-# Publicar a aplicação em modo Release
-# Ajuste o caminho do .csproj se necessário
-WORKDIR /source/CajuTalkAPI
-RUN dotnet publish "./CajuTalkAPI.csproj" -c Release -o /app/publish --no-restore
+# Publicar a aplicação (referencia o csproj em /source)
+# Certifique-se que o WORKDIR ainda é /source
+RUN dotnet publish "./CajuTalkAPI.csproj" -c Release -o /app/publish --no-restore # <-- CORRIGIDO: Caminho direto
 
 # --- Estágio 2: Runtime ---
-# Use a imagem de runtime ASP.NET Core correspondente (mais leve que a SDK)
+# Use a imagem de runtime ASP.NET Core correspondente
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
 # Copiar a saída publicada do estágio de build
 COPY --from=build /app/publish .
 
-# Definir a variável de ambiente para a porta (Render usa a variável PORT, mas ASP.NET Core 8+ usa 8080 por padrão)
-# Kestrel geralmente escuta em http://+:8080 por padrão em contêineres .NET 8+
-# Você pode descomentar a linha abaixo se quiser ser explícito ou se o Render exigir especificamente URLs
-# ENV ASPNETCORE_URLS=http://+:8080
+# Expor a porta padrão do Kestrel em contêineres
 EXPOSE 8080
 
 # Ponto de entrada para rodar a aplicação
-# Certifique-se que "CajuTalkAPI.dll" corresponde ao nome do assembly de saída do seu projeto
+# Certifique-se que "CajuTalkAPI.dll" corresponde ao nome do assembly de saída
 ENTRYPOINT ["dotnet", "CajuTalkAPI.dll"]
