@@ -6,7 +6,8 @@ WORKDIR /source
 # Copiar arquivos de projeto/solução da raiz do contexto
 # O contexto é a pasta onde o Dockerfile está (CAJUTALKAPI/)
 COPY *.sln .
-COPY CajuTalkAPI.csproj .  # <-- CORRIGIDO: Copia da raiz para /source
+# <-- CORRIGIDO: Copia da raiz para /source  <-- MOVA O COMENTÁRIO PARA CÁ
+COPY CajuTalkAPI.csproj .
 
 # Restaurar dependências (referencia o csproj em /source)
 RUN dotnet restore "./CajuTalkAPI.csproj" # <-- CORRIGIDO: Caminho direto
