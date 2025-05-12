@@ -20,7 +20,7 @@ namespace TWTodos.Controllers
     {
         private readonly CajuTalkContext _context;
         private readonly IWebHostEnvironment _env;
-        private const string DefaultProfilePicUrl = "http://localhost:5109/uploads/default-profile.png";
+        private const string DefaultProfilePicUrl = "https://cajutalkapi.onrender.com/uploads/default-profile.png";
         private readonly IPasswordHasher<Usuario> _passwordHasher;
         private readonly ILogger<UsuariosController> _logger;
 
