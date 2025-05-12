@@ -48,6 +48,35 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<CajuTalkContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>(); // Opcional, mas útil
+
+        // Verifica se o provedor é relacional antes de tentar migrar
+        if (context.Database.IsRelational()) // Ou IsNpgsql() se quiser ter certeza
+        {
+            logger.LogInformation("--> Attempting to apply EF Core migrations...");
+            context.Database.Migrate(); // Aplica migrações pendentes
+            logger.LogInformation("--> EF Core migrations applied successfully or no pending migrations.");
+        }
+        else
+        {
+            logger.LogInformation("--> Database provider is not relational. Skipping migrations.");
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>(); // Opcional
+        logger.LogError(ex, "--> ERROR applying EF Core migrations.");
+        // Você pode querer parar a aplicação aqui se a migração for crítica
+        // throw;
+    }
+}
+
 var app = builder.Build();
 app.UseRouting();
 app.UseCors("AllowAll");
