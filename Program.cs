@@ -75,7 +75,7 @@ using (var scope = app.Services.CreateScope())
         var logger = services.GetRequiredService<ILogger<Program>>(); // Opcional
         logger.LogError(ex, "--> ERROR applying EF Core migrations.");
         // Você pode querer parar a aplicação aqui se a migração for crítica
-        // throw;
+        throw;
     }
 }
 
