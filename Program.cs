@@ -48,6 +48,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
+var app = builder.Build();
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -77,7 +79,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-var app = builder.Build();
 app.UseRouting();
 app.UseCors("AllowAll");
 app.UseStaticFiles();
