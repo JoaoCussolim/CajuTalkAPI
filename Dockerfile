@@ -33,7 +33,7 @@ COPY --from=build /app/publish .
 # Kestrel geralmente escuta em http://+:8080 por padrão em contêineres .NET 8+
 # Você pode descomentar a linha abaixo se quiser ser explícito ou se o Render exigir especificamente URLs
 # ENV ASPNETCORE_URLS=http://+:8080
-EXPOSE 8080 # Expor a porta padrão do Kestrel em contêineres
+EXPOSE 8080
 
 # Ponto de entrada para rodar a aplicação
 # Certifique-se que "CajuTalkAPI.dll" corresponde ao nome do assembly de saída do seu projeto
