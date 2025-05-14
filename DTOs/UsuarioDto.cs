@@ -1,4 +1,4 @@
-namespace TWTodos.DTOs // Certifique-se que o namespace está correto
+namespace TWTodos.DTOs
 {
     public class UsuarioDto
     {

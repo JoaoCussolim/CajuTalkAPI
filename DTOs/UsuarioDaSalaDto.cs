@@ -1,6 +1,5 @@
-namespace TWTodos.DTOs // Define o namespace onde a classe reside (correto)
+namespace TWTodos.DTOs
 {
-    // Declara a classe como pública para ser acessível por outros partes do código (como o Controller)
     public class UsuarioDaSalaDto
     {
         public int UsuarioId { get; set; }

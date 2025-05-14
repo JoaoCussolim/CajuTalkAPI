@@ -6,6 +6,6 @@ namespace TWTodos.Models
         Audio,
         Video,
         Imagem,
-        Arquivo // For generic files
+        Arquivo
     }
 }

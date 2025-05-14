@@ -28,15 +28,7 @@ namespace TWTodos.Models
         [ForeignKey("UsuarioId")]
         public virtual Usuario Usuario { get; set; } = null!; // Para CS8618
 
-        // --- ADICIONE ESTA PROPRIEDADE ---
-        // Propriedade calculada que não é mapeada para o banco (não precisa de coluna)
-        // Retorna true se o token NÃO foi revogado E a data atual é ANTES da expiração.
-        [NotMapped] // Importante: informa ao EF para NÃO criar uma coluna para isso
+        [NotMapped]
         public bool IsActive => Revoked == null && DateTime.UtcNow < Expires;
-        // ---------------------------------
-
-        // Opcional: propriedade para checar apenas expiração
-        // [NotMapped]
-        // public bool IsExpired => DateTime.UtcNow >= Expires;
     }
 }

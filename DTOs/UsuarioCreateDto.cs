@@ -15,7 +15,5 @@ namespace TWTodos.DTOs
         [Required(ErrorMessage = "A senha é obrigatória.")]
         [MinLength(6, ErrorMessage = "A senha deve ter no mínimo 6 caracteres.")]
         public string SenhaUsuario { get; set; } = null!; // Recebe a senha em texto plano
-
-        // FotoPerfilURL geralmente é definida como padrão na criação, então não precisa vir aqui.
     }
 }

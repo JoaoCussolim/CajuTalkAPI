@@ -11,21 +11,18 @@ using System.Linq; // Para AnyAsync, FirstOrDefaultAsync
 namespace TWTodos.Controllers
 {
     [ApiController]
-    [Route("[controller]")] // Rota base: /api/usuariosala
+    [Route("[controller]")]
     [Authorize] // Todas as ações neste controller exigem autenticação
     public class UsuarioSalaController : ControllerBase
     {
         private readonly CajuTalkContext _context;
-        // Opcional: IPasswordHasher se precisar verificar senha da sala ao entrar
-        // private readonly IPasswordHasher<SalaChat> _salaPasswordHasher;
 
-        public UsuarioSalaController(CajuTalkContext context /*, IPasswordHasher<SalaChat> salaPasswordHasher */)
+
+        public UsuarioSalaController(CajuTalkContext context)
         {
             _context = context;
-            // _salaPasswordHasher = salaPasswordHasher;
         }
 
-        // --- Helper para obter User ID do Token ---
         private bool TryGetUserId(out int userId)
         {
             userId = 0;
@@ -37,8 +34,7 @@ namespace TWTodos.Controllers
             return false;
         }
 
-        // --- Entrar em uma Sala ---
-        [HttpPost("entrar")] // POST /usuariosala/entrar
+        [HttpPost("entrar")]
         public async Task<IActionResult> EntrarSala([FromBody] EntrarSalaDto entrarDto)
         {
             if (!TryGetUserId(out int userId))
@@ -46,14 +42,12 @@ namespace TWTodos.Controllers
                 return Unauthorized("Usuário não identificado.");
             }
 
-            // Verificar se a sala existe
             var sala = await _context.SalasChat.FindAsync(entrarDto.SalaId);
             if (sala == null)
             {
                 return NotFound($"Sala com ID {entrarDto.SalaId} não encontrada.");
             }
 
-            // Verificar se o usuário já está na sala
             bool jaExiste = await _context.UsuarioSala
                 .AnyAsync(us => us.ID_Usuario == userId && us.ID_Sala == entrarDto.SalaId);
 
@@ -66,7 +60,6 @@ namespace TWTodos.Controllers
                  if (relacaoExistente != null && relacaoExistente.UsuarioBanido) {
                      return Forbid($"Você está banido da sala '{sala.Nome}'."); // 403 Forbidden
                  }
-                 // Se não está banido, talvez retornar OK ou um DTO da relação existente
                 return Ok(new UsuarioSalaDto { // Exemplo de retorno
                      Id = relacaoExistente.ID,
                      UsuarioId = relacaoExistente.ID_Usuario,
@@ -74,34 +67,23 @@ namespace TWTodos.Controllers
                      IsCriador = relacaoExistente.Criador,
                      IsBanido = relacaoExistente.UsuarioBanido
                  });
-                // return Conflict($"Usuário já pertence à sala '{sala.Nome}'.");
             }
-
-             // Verificar se o usuário está banido (caso a relação tenha sido mantida com UsuarioBanido=true)
-            // (A lógica acima já cobre isso se a relação existe)
 
             // Verificar se a sala é privada e requer senha
             if (!sala.Publica)
             {
                 if (string.IsNullOrWhiteSpace(sala.Senha)) {
-                    // Sala privada sem senha configurada - talvez um erro interno ou lógica específica
                     return BadRequest("Esta sala privada não pode ser acessada no momento.");
                 }
-                 if (string.IsNullOrWhiteSpace(entrarDto.Senha)) {
-                    return BadRequest("Senha é obrigatória para entrar nesta sala privada.");
-                 }
 
-                // Aqui você precisaria de um HASH da senha da sala para comparar.
-                // Supondo que a senha da sala NÃO seja hashada (o que é INSEGURO), seria:
+                if (string.IsNullOrWhiteSpace(entrarDto.Senha)) {
+                    return BadRequest("Senha é obrigatória para entrar nesta sala privada.");
+                }
+
                 if (sala.Senha != entrarDto.Senha)
                 {
                     return Unauthorized("Senha da sala incorreta.");
                 }
-                // SE A SENHA DA SALA FOSSE HASHADA (recomendado):
-                // var verificationResult = _salaPasswordHasher.VerifyHashedPassword(sala, sala.SenhaHash, entrarDto.Senha);
-                // if (verificationResult == PasswordVerificationResult.Failed) {
-                //     return Unauthorized("Senha da sala incorreta.");
-                // }
             }
 
 
@@ -110,7 +92,7 @@ namespace TWTodos.Controllers
             {
                 ID_Usuario = userId,
                 ID_Sala = entrarDto.SalaId,
-                Criador = false, // Quem entra nunca é o criador por esta ação
+                Criador = false,
                 UsuarioBanido = false
             };
 
@@ -150,8 +132,6 @@ namespace TWTodos.Controllers
                 return NotFound($"Você não pertence à sala com ID {salaId}.");
             }
 
-            // Regra de Negócio: Impedir o criador de sair? Ou transferir propriedade?
-            // Simples: Impedir criador de sair por esta rota.
             if (relacao.Criador)
             {
                 return BadRequest("O criador não pode sair da sala por esta rota. Considere excluir a sala.");
@@ -164,8 +144,7 @@ namespace TWTodos.Controllers
             return NoContent(); // 204 No Content é o padrão para DELETE bem-sucedido
         }
 
-        // --- Banir um Usuário de uma Sala (Ação de Admin/Criador) ---
-        [HttpPut("{salaId}/usuarios/{usuarioIdParaBanir}/banir")] // PUT /api/usuariosala/{salaId}/usuarios/{usuarioIdParaBanir}/banir
+        [HttpPut("{salaId}/usuarios/{usuarioIdParaBanir}/banir")]
         public async Task<IActionResult> BanirUsuario(int salaId, int usuarioIdParaBanir)
         {
             if (!TryGetUserId(out int adminUserId))
@@ -197,9 +176,6 @@ namespace TWTodos.Controllers
 
             if (relacaoAlvo == null)
             {
-                // O usuário nem está na sala para ser banido
-                // Ou você pode querer criar um registro de banimento mesmo assim?
-                // Simples: Retornar NotFound se não está na sala.
                  return NotFound($"Usuário com ID {usuarioIdParaBanir} não encontrado na sala {salaId}.");
             }
 
@@ -262,10 +238,7 @@ namespace TWTodos.Controllers
              };
             return Ok(dtoResultado);
         }
-
-         // --- Obter detalhes de uma relação específica (Opcional) ---
-        // GET /api/usuariosala/{id}  (Pelo ID da relação)
-        // GET /api/usuariosala/salas/{salaId}/usuarios/{usuarioId} (Mais RESTful)
+        
         [HttpGet("salas/{salaId}/usuarios/{usuarioId}")]
         public async Task<ActionResult<UsuarioSalaDto>> GetRelacaoUsuarioSala(int salaId, int usuarioId)
         {

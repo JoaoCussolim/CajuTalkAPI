@@ -12,8 +12,6 @@ namespace TWTodos.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    // Você pode adicionar [Authorize] aqui se TODAS as rotas deste controller
-    // exigirem autenticação. Caso contrário, coloque nos métodos específicos.
     public class SalasController : ControllerBase
     {
             private readonly CajuTalkContext _context;
@@ -37,7 +35,6 @@ namespace TWTodos.Controllers
             }
 
             // --- Rota GET para obter os usuários de uma sala específica ---
-            // (Adicionada conforme solicitado anteriormente)
             [HttpGet("{salaId}/usuarios")]
             [Authorize] // Exige autenticação para ver a lista de usuários
             public async Task<ActionResult<IEnumerable<UsuarioDaSalaDto>>> GetUsuariosDaSala(int salaId)
@@ -67,7 +64,6 @@ namespace TWTodos.Controllers
                 }
 
                 // 3. Consultar e mapear usuários da sala
-                // Assumindo que existe _context.Usuarios e que Usuario tem ID, LoginUsuario, FotoPerfilURL
                 var usuariosDaSalaDto = await _context.UsuarioSala
                     .Where(us => us.ID_Sala == salaId)
                     .Join(
@@ -77,8 +73,8 @@ namespace TWTodos.Controllers
                         (us, u) => new UsuarioDaSalaDto
                         {
                             UsuarioId = u.ID,
-                            LoginUsuario = u.LoginUsuario, // Ajuste se o nome da propriedade for diferente
-                            FotoPerfilURL = u.FotoPerfilURL, // Ajuste se existir/tiver outro nome
+                            LoginUsuario = u.LoginUsuario,
+                            FotoPerfilURL = u.FotoPerfilURL,
                             IsCriador = us.Criador,
                             IsBanido = us.UsuarioBanido
                         })
@@ -136,7 +132,7 @@ namespace TWTodos.Controllers
             [Authorize]
             public async Task<IActionResult> CriarSala([FromBody] SalaCreateDto SalaCreateDto)
             {
-                // 1. Obter o ID do Criador (como antes)
+                // 1. Obter o ID do Criador
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null)
                 {
@@ -147,7 +143,7 @@ namespace TWTodos.Controllers
                     return BadRequest("O formato do ID do usuário no token é inválido.");
                 }
 
-                // 2. Validação Adicional (como antes)
+                // 2. Validação Adicional
                 if (!SalaCreateDto.Publica && string.IsNullOrWhiteSpace(SalaCreateDto.Senha))
                 {
                     ModelState.AddModelError(nameof(SalaCreateDto.Senha), "Uma senha é obrigatória para salas privadas.");
@@ -158,7 +154,7 @@ namespace TWTodos.Controllers
                     SalaCreateDto.Senha = null;
                 }
 
-                // 3. Mapear DTO para Entidade SalaChat (como antes)
+                // 3. Mapear DTO para Entidade SalaChat
                 var sala = new SalaChat
                 {
                     Nome = SalaCreateDto.Nome,
@@ -172,7 +168,6 @@ namespace TWTodos.Controllers
                 _context.SalasChat.Add(sala);
                 await _context.SaveChangesAsync(); // <--- PRIMEIRO SAVE (obtém sala.ID)
 
-                // **** ETAPA ADICIONAL: Adicionar o criador à tabela Usuario_Sala ****
                 try // É bom ter um try-catch aqui para o caso de falha na segunda inserção
                 {
                     var associacaoCriador = new UsuarioSala
@@ -183,15 +178,12 @@ namespace TWTodos.Controllers
                         UsuarioBanido = false     // Garante que o criador não começa banido
                     };
                     _context.UsuarioSala.Add(associacaoCriador);
-                    await _context.SaveChangesAsync(); // <--- SEGUNDO SAVE (salva a associação)
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateException ex)
                 {
-                    // Logar o erro (ex)
-                    // Opcional: tentar deletar a sala que foi criada se a associação falhar? (Transação seria melhor)
                     return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao associar o criador à sala após a criação.");
                 }
-                // *****************************************************************
 
                 // 5. Mapear Entidade para DTO de Resposta (como antes)
                 var salaDto = new SalaChatDto
@@ -204,17 +196,13 @@ namespace TWTodos.Controllers
                 };
 
                 // 6. Retornar Resposta 201 Created (como antes)
-                // Se você tiver uma action ObterPorId em SalasController:
-                // return CreatedAtAction(nameof(ObterPorId), new { id = sala.ID }, salaDto);
-                // Se não tiver, pode retornar Ok ou Created com a URL direta:
-                return Created($"/salas/{sala.ID}", salaDto); // Ajuste a URL conforme sua rota GET
+                return Created($"/salas/{sala.ID}", salaDto);
             }
 
         // --- Rota GET para obter todas as salas ---
         // Permite acesso anônimo (não precisa estar logado).
-        // Se você quiser que apenas usuários logados vejam as salas, mude para [Authorize].
         [HttpGet]
-        [AllowAnonymous] // Ou [Authorize] se necessário
+        [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<SalaChatDto>>> ObterTodas()
         {
             // Mapeia diretamente para DTO na consulta para eficiência
@@ -226,7 +214,6 @@ namespace TWTodos.Controllers
                     Publica = s.Publica,
                     FotoPerfilURL = s.FotoPerfilURL,
                     CriadorID = s.CriadorID
-                    // Senha NÃO é incluída
                 })
                 .ToListAsync();
 
@@ -235,8 +222,6 @@ namespace TWTodos.Controllers
 
         // --- Rota GET para obter uma sala pelo seu ID ---
         // Permite acesso anônimo.
-        // Se você quiser que apenas usuários logados vejam detalhes da sala, mude para [Authorize].
-        // Poderia ter lógica adicional aqui (ex: verificar se o usuário pertence à sala se for privada).
         [HttpGet("{id}")]
         [AllowAnonymous] // Ou [Authorize] se necessário
         public async Task<ActionResult<SalaChatDto>> ObterPorId(int id)
@@ -257,7 +242,6 @@ namespace TWTodos.Controllers
                 Publica = sala.Publica,
                 FotoPerfilURL = sala.FotoPerfilURL,
                 CriadorID = sala.CriadorID
-                // Senha NÃO é incluída
             };
 
             return Ok(salaDto); // Retorna 200 OK com o DTO da sala
