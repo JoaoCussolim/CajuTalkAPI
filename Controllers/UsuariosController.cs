@@ -70,6 +70,36 @@ namespace TWTodos.Controllers
             return Ok(usuarioDto); // Retorna o DTO encontrado
         }
 
+        [HttpGet("buscar")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<UsuarioDto>))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<UsuarioDto>>> BuscarUsuarios([FromQuery] string termoBusca)
+        {
+            if (string.IsNullOrWhiteSpace(termoBusca))
+            {
+                return BadRequest("O termo de busca não pode ser vazio.");
+            }
+
+            var termoBuscaLower = termoBusca.ToLowerInvariant();
+
+            var usuariosEncontradosDto = await _context.Usuarios
+                .Where(u => 
+                    (u.NomeUsuario != null && u.NomeUsuario.ToLowerInvariant().Contains(termoBuscaLower)) ||
+                    (u.LoginUsuario != null && u.LoginUsuario.ToLowerInvariant().Contains(termoBuscaLower))
+                )
+                .Select(u => new UsuarioDto // Mapeia para o DTO
+                {
+                    ID = u.ID,
+                    NomeUsuario = u.NomeUsuario,
+                    LoginUsuario = u.LoginUsuario,
+                    FotoPerfilURL = u.FotoPerfilURL
+                })
+                .ToListAsync();
+
+            return Ok(usuariosEncontradosDto);
+        }
+
+
         [HttpPut("{id}")]
         public async Task<IActionResult> AtualizarUsuario(int id, [FromBody] UsuarioUpdateDto updateDto)
         {
