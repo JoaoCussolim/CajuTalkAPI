@@ -42,7 +42,8 @@ namespace TWTodos.Controllers
                     ID = u.ID,
                     NomeUsuario = u.NomeUsuario,
                     LoginUsuario = u.LoginUsuario,
-                    FotoPerfilURL = u.FotoPerfilURL
+                    FotoPerfilURL = u.FotoPerfilURL,
+                    Recado = u.Recado
                 })
                 .ToListAsync();
 
@@ -60,7 +61,8 @@ namespace TWTodos.Controllers
                     ID = u.ID,
                     NomeUsuario = u.NomeUsuario,
                     LoginUsuario = u.LoginUsuario,
-                    FotoPerfilURL = u.FotoPerfilURL
+                    FotoPerfilURL = u.FotoPerfilURL,
+                    Recado = u.Recado
                 })
                 .FirstOrDefaultAsync();
 
@@ -92,13 +94,13 @@ namespace TWTodos.Controllers
                     ID = u.ID,
                     NomeUsuario = u.NomeUsuario,
                     LoginUsuario = u.LoginUsuario,
-                    FotoPerfilURL = u.FotoPerfilURL
+                    FotoPerfilURL = u.FotoPerfilURL,
+                    Recado = u.Recado
                 })
                 .ToListAsync();
 
             return Ok(usuariosEncontradosDto);
         }
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> AtualizarUsuario(int id, [FromBody] UsuarioUpdateDto updateDto)
@@ -110,7 +112,6 @@ namespace TWTodos.Controllers
                 return NotFound("Usuário não encontrado.");
             }
 
-            // Check for login conflict only if the login is being changed
             if (!string.IsNullOrWhiteSpace(updateDto.LoginUsuario) &&
                 updateDto.LoginUsuario != usuario.LoginUsuario &&
                 await _context.Usuarios.AnyAsync(u => u.LoginUsuario == updateDto.LoginUsuario && u.ID != id))
@@ -118,7 +119,6 @@ namespace TWTodos.Controllers
                 return Conflict("Login já está em uso por outro usuário.");
             }
 
-            // Update properties if provided in the model
             if (!string.IsNullOrWhiteSpace(updateDto.NomeUsuario))
             {
                 usuario.NomeUsuario = updateDto.NomeUsuario;
@@ -129,27 +129,22 @@ namespace TWTodos.Controllers
             }
             if (!string.IsNullOrWhiteSpace(updateDto.SenhaUsuario))
             {
-                // *** Hash the password IF it's being updated ***
                 usuario.SenhaHash = _passwordHasher.HashPassword(usuario, updateDto.SenhaUsuario);
             }
 
-            // Handle optional photo upload
             if (updateDto.NovaFotoPerfil != null && updateDto.NovaFotoPerfil.Length > 0)
             {
-                // Delete old photo if it's not the default one
                 if (!string.IsNullOrEmpty(usuario.FotoPerfilURL) && usuario.FotoPerfilURL != DefaultProfilePicUrl)
                 {
                     DeleteFile(usuario.FotoPerfilURL);
                 }
 
-                // Save new photo and update URL
                 try
                 {
                     usuario.FotoPerfilURL = updateDto.NovaFotoPerfil;
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception
                     return StatusCode(500, $"Erro interno ao salvar a imagem: {ex.Message}");
                 }
             }
@@ -161,7 +156,6 @@ namespace TWTodos.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                // Handle potential concurrency issues if needed
                 if (!await UsuarioExists(id))
                 {
                     return NotFound();
@@ -172,7 +166,12 @@ namespace TWTodos.Controllers
                 }
             }
 
-            return Ok(usuario); // Standard REST response for successful PUT
+            if (!string.IsNullOrWhiteSpace(updateDto.Recado))
+            {
+                usuario.Recado = updateDto.Recado;
+            }
+
+            return Ok(usuario);
         }
 
         [HttpDelete("{id}")]
@@ -199,19 +198,17 @@ namespace TWTodos.Controllers
 
                 _logger.LogInformation("Usuário com ID {UserId} deletado com sucesso do banco de dados.", id);
 
-                // Tenta deletar a foto de perfil APÓS sucesso no banco
-                // Não deleta a foto default
                 if (!string.IsNullOrEmpty(fotoUrlParaDeletar) && fotoUrlParaDeletar != DefaultProfilePicUrl)
                 {
-                    DeleteFile(fotoUrlParaDeletar); // Usa o helper existente
+                    DeleteFile(fotoUrlParaDeletar);
                 }
 
-                return NoContent(); // Retorno padrão para DELETE bem-sucedido
+                return NoContent();
             }
-            catch (DbUpdateException dbEx) // Erro ao salvar (provavelmente FK constraint)
+            catch (DbUpdateException dbEx)
             {
                 // Log detalhado do erro de banco
-                 _logger.LogError(dbEx, "Erro ao deletar usuário ID {UserId} do banco de dados. Possível violação de FK.", id);
+                _logger.LogError(dbEx, "Erro ao deletar usuário ID {UserId} do banco de dados. Possível violação de FK.", id);
                 // Retorna um erro que indica que a operação não pôde ser completada por causa de dependências
                 return Conflict($"Não foi possível deletar o usuário {id}. Pode haver dados associados (mensagens, salas, etc.) que impedem a exclusão.");
             }
@@ -222,8 +219,6 @@ namespace TWTodos.Controllers
             }
         }
 
-        // Não usado por enquanto ----
-        // Helper method to save uploaded file
         private async Task<string> SaveFileAsync(IFormFile file)
         {
             if (string.IsNullOrWhiteSpace(_env.WebRootPath))
@@ -245,12 +240,9 @@ namespace TWTodos.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            // Return the relative path accessible by the web server
             return "/uploads/" + uniqueFileName;
         }
-        // ----
 
-        // Helper method to delete a file
         private void DeleteFile(string relativeOrAbsolutePath)
         {
             if (string.IsNullOrWhiteSpace(relativeOrAbsolutePath) || string.IsNullOrWhiteSpace(_env.WebRootPath))
@@ -265,16 +257,14 @@ namespace TWTodos.Controllers
                 // Tenta determinar se é URL absoluta ou caminho relativo
                 if (Uri.TryCreate(relativeOrAbsolutePath, UriKind.Absolute, out var uri) && (uri.Scheme == "http" || uri.Scheme == "https"))
                 {
-                    // É uma URL absoluta, extrai o caminho relativo (ex: de http://host/uploads/img.png para /uploads/img.png)
                     var relativePath = uri.AbsolutePath;
-                    // Remove a barra inicial para combinar corretamente com WebRootPath
                     relativePath = relativePath.TrimStart('/');
                         var uploadsFolder = Path.GetDirectoryName(relativePath)?.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).FirstOrDefault() ?? "uploads"; // Tenta pegar a pasta raiz (ex: 'uploads')
                     var fileName = Path.GetFileName(relativePath);
                     fullPath = Path.Combine(_env.WebRootPath, uploadsFolder, fileName);
 
                 }
-                else // Assume que é um caminho relativo (ex: /uploads/img.png)
+                else
                 {
                     var relativePath = relativeOrAbsolutePath.TrimStart('/');
                     var uploadsFolder = Path.GetDirectoryName(relativePath)?.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar).FirstOrDefault() ?? "uploads"; // Tenta pegar a pasta raiz (ex: 'uploads')
@@ -305,13 +295,9 @@ namespace TWTodos.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro inesperado ao tentar deletar arquivo {FilePath}", relativeOrAbsolutePath);
-                // Dependendo da política, pode querer relançar ou apenas logar
             }
         }
 
-
-
-        // Helper method to check if user exists
         private async Task<bool> UsuarioExists(int id)
         {
             return await _context.Usuarios.AnyAsync(e => e.ID == id);
