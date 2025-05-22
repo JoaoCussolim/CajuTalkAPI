@@ -146,8 +146,8 @@ namespace TWTodos.Controllers
                 NomeUsuario = model.NomeUsuario,
                 LoginUsuario = model.LoginUsuario,
                 FotoPerfilURL = DefaultProfilePicUrl,
-                CorFundo = "255250250" // Defina como preferir
-                // Inicialize outras propriedades se necessário
+                CorFundo = "255250250",
+                Recado = "Olá, estou utilizando Cajutalk!"
             };
 
             usuario.SenhaHash = _passwordHasher.HashPassword(usuario, model.SenhaUsuario);
