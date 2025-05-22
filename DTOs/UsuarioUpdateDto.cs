@@ -14,6 +14,8 @@ namespace TWTodos.DTOs
         [MinLength(6, ErrorMessage = "A senha deve ter no mínimo 6 caracteres.")]
         public string? SenhaUsuario { get; set; } // Nullable. Recebe a NOVA senha em texto plano
 
+        public string? Recado { get; set; }
+
         public string? NovaFotoPerfil { get; set; }
     }
 }

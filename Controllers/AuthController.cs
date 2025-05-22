@@ -146,27 +146,23 @@ namespace TWTodos.Controllers
                 NomeUsuario = model.NomeUsuario,
                 LoginUsuario = model.LoginUsuario,
                 FotoPerfilURL = DefaultProfilePicUrl,
-                CorFundo = "255250250" // Defina como preferir
-                // Inicialize outras propriedades se necessário
+                CorFundo = "255250250"
+                Recado = "Olá, estou utilizando Cajutalk!"
             };
 
             usuario.SenhaHash = _passwordHasher.HashPassword(usuario, model.SenhaUsuario);
 
             _context.Usuarios.Add(usuario);
-            // Salva o usuário primeiro para obter o ID
             await _context.SaveChangesAsync();
 
-            // Agora que o usuário tem ID, gerar tokens
             var accessTokenData = _tokenService.GenerateToken(usuario);
             var refreshToken = GenerateRefreshToken(usuario.ID);
 
             _context.RefreshTokens.Add(refreshToken);
-            // Salva o refresh token
             await _context.SaveChangesAsync();
 
             var accessTokenExpiration = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:AccessTokenExpirationMinutes"] ?? "15"));
 
-            // Retornar o TokenResponse do namespace TWTodos.Models
             return Ok(new TokenResponse
             {
                 AccessToken = accessTokenData,

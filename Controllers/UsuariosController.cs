@@ -42,7 +42,8 @@ namespace TWTodos.Controllers
                     ID = u.ID,
                     NomeUsuario = u.NomeUsuario,
                     LoginUsuario = u.LoginUsuario,
-                    FotoPerfilURL = u.FotoPerfilURL
+                    FotoPerfilURL = u.FotoPerfilURL,
+                    Recado = u.Recado
                 })
                 .ToListAsync();
 
@@ -60,7 +61,8 @@ namespace TWTodos.Controllers
                     ID = u.ID,
                     NomeUsuario = u.NomeUsuario,
                     LoginUsuario = u.LoginUsuario,
-                    FotoPerfilURL = u.FotoPerfilURL
+                    FotoPerfilURL = u.FotoPerfilURL,
+                    Recado = u.Recado
                 })
                 .FirstOrDefaultAsync();
 
@@ -92,7 +94,8 @@ namespace TWTodos.Controllers
                     ID = u.ID,
                     NomeUsuario = u.NomeUsuario,
                     LoginUsuario = u.LoginUsuario,
-                    FotoPerfilURL = u.FotoPerfilURL
+                    FotoPerfilURL = u.FotoPerfilURL,
+                    Recado = u.Recado
                 })
                 .ToListAsync();
 
@@ -161,6 +164,11 @@ namespace TWTodos.Controllers
                 {
                     throw;
                 }
+            }
+
+            if (!string.IsNullOrWhiteSpace(updateDto.Recado))
+            {
+                usuario.Recado = updateDto.Recado;
             }
 
             return Ok(usuario);
