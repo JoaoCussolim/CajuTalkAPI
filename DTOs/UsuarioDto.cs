@@ -7,5 +7,6 @@ namespace TWTodos.DTOs // Certifique-se que o namespace está correto
         public required string LoginUsuario { get; set; } // Use 'required' ou inicialize = string.Empty;
         public string? FotoPerfilURL { get; set; } // URL pode ser nula/vazia
         public string? CorFundo { get; set; }
+        public string? Recado {get; set; }
     }
 }

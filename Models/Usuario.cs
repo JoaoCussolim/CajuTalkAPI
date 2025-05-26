@@ -14,6 +14,7 @@ namespace TWTodos.Models
         public string SenhaHash { get; set; }
         public string? FotoPerfilURL { get; set; }
         public string? CorFundo { get; set; }
+        public string? Recado {get; set; }
 
         public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
