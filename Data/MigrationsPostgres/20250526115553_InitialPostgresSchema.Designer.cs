@@ -12,7 +12,7 @@ using TWTodos.Data;
 namespace CajuTalkAPI.Data.MigrationsPostgres
 {
     [DbContext(typeof(CajuTalkContext))]
-    [Migration("20250512132351_InitialPostgresSchema")]
+    [Migration("20250526115553_InitialPostgresSchema")]
     partial class InitialPostgresSchema
     {
         /// <inheritdoc />
@@ -140,6 +140,9 @@ namespace CajuTalkAPI.Data.MigrationsPostgres
 
                     b.Property<string>("NomeUsuario")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Recado")
                         .HasColumnType("text");
 
                     b.Property<string>("SenhaHash")

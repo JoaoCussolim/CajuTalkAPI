@@ -62,7 +62,8 @@ namespace CajuTalkAPI.Data.MigrationsPostgres
                     LoginUsuario = table.Column<string>(type: "text", nullable: false),
                     SenhaHash = table.Column<string>(type: "text", nullable: false),
                     FotoPerfilURL = table.Column<string>(type: "text", nullable: true),
-                    CorFundo = table.Column<string>(type: "text", nullable: true)
+                    CorFundo = table.Column<string>(type: "text", nullable: true),
+                    Recado = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

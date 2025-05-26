@@ -15,5 +15,7 @@ namespace TWTodos.DTOs
         public string? SenhaUsuario { get; set; } // Nullable. Recebe a NOVA senha em texto plano
 
         public string? NovaFotoPerfil { get; set; } // Optional new photo
+
+        public string? Recado {get; set; }
     }
 }

@@ -139,6 +139,9 @@ namespace CajuTalkAPI.Data.MigrationsPostgres
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Recado")
+                        .HasColumnType("text");
+
                     b.Property<string>("SenhaHash")
                         .IsRequired()
                         .HasColumnType("text");
