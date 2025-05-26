@@ -146,7 +146,7 @@ namespace TWTodos.Controllers
                 NomeUsuario = model.NomeUsuario,
                 LoginUsuario = model.LoginUsuario,
                 FotoPerfilURL = DefaultProfilePicUrl,
-                CorFundo = "255250250"
+                CorFundo = "255250250",
                 Recado = "Olá, estou utilizando Cajutalk!"
             };
 
