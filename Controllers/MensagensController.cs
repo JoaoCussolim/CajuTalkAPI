@@ -152,31 +152,17 @@ namespace TWTodos.Controllers
                 return StatusCode(500, "Erro ao buscar dados do remetente após salvar a mensagem.");
             }
 
-            var mensagensDto = await _context.Mensagens
-                .AsNoTracking() // Melhora a performance para consultas de apenas leitura
-                .Where(m => m.ID_Sala == idSala)
-                .OrderBy(m => m.DataEnvio)
-                .Select(msg => new MensagemDto // Para cada mensagem, projeta em um DTO
-                {
-                    Id = msg.ID,
-                    SalaId = msg.ID_Sala,
-                    Conteudo = msg.Conteudo,
-                    DataEnvio = msg.DataEnvio,
-                    TipoMensagem = msg.TipoMensagem,
-                    // CORREÇÃO: Pega o ID do usuário diretamente da mensagem.
-                    UsuarioId = msg.ID_Usuario,
-                    // CORREÇÃO: Busca os dados do usuário correspondente usando uma sub-consulta.
-                    // Esta forma é mais robusta que o Join.
-                    LoginUsuario = _context.Usuarios
-                                     .Where(u => u.ID == msg.ID_Usuario)
-                                     .Select(u => u.LoginUsuario)
-                                     .FirstOrDefault(),
-                    FotoPerfilURL = _context.Usuarios
-                                      .Where(u => u.ID == msg.ID_Usuario)
-                                      .Select(u => u.FotoPerfilURL)
-                                      .FirstOrDefault()
-                })
-                .ToListAsync();
+            var mensagemDto = new MensagemDto
+            {
+                Id = mensagem.ID,
+                SalaId = mensagem.ID_Sala,
+                Conteudo = mensagem.Conteudo, // Será a URL do arquivo se for um arquivo
+                DataEnvio = mensagem.DataEnvio,
+                TipoMensagem = mensagem.TipoMensagem,
+                UsuarioId = mensagem.ID_Usuario,
+                LoginUsuario = remetente.LoginUsuario,
+                FotoPerfilURL = remetente.FotoPerfilURL
+            };
 
             return Ok(mensagemDto);
         }
