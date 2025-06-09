@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging; // Adicionado para logging
+using Microsoft.AspNetCore.Authorization; // Adicionado para proteger a rota de exclusão
 
 namespace TWTodos.Controllers
 {
@@ -13,12 +14,15 @@ namespace TWTodos.Controllers
     public class UploadController : ControllerBase
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogger<UploadController> _logger; // Adicionado
 
-        public UploadController(IWebHostEnvironment webHostEnvironment)
+        public UploadController(IWebHostEnvironment webHostEnvironment, ILogger<UploadController> logger)
         {
             _webHostEnvironment = webHostEnvironment;
+            _logger = logger; // Adicionado
         }
 
+        // ROTA POST PARA UPLOAD (EXISTENTE)
         [HttpPost("file")]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
@@ -47,7 +51,8 @@ namespace TWTodos.Controllers
             return Ok(new { url = fileUrl });
         }
 
-    [HttpDelete("{fileName}")]
+        // **** NOVA ROTA DELETE ****
+        [HttpDelete("{fileName}")]
         [Authorize] // Protege a rota, apenas usuários autenticados podem deletar.
         public IActionResult DeleteFile(string fileName)
         {

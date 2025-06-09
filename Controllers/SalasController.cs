@@ -93,7 +93,7 @@ namespace TWTodos.Controllers
             [Authorize]
             public async Task<IActionResult> DeletarSala(int id)
             {
-                if (!TryGetUserId(out int requestingUserId)) { /* ... */ }
+                if (!TryGetUserId(out int requestingUserId)) {  }
 
                 var sala = await _context.SalasChat.FindAsync(id);
                 if (sala == null)
