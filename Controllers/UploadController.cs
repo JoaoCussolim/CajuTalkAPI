@@ -46,4 +46,48 @@ namespace TWTodos.Controllers
             return Ok(new { url = fileUrl });
         }
     }
+
+    [HttpDelete("{fileName}")]
+        [Authorize] // Protege a rota, apenas usuários autenticados podem deletar.
+        public IActionResult DeleteFile(string fileName)
+        {
+            // Medida de segurança básica para evitar ataques de "path traversal"
+            // Impede que o cliente tente apagar arquivos fora da pasta de uploads.
+            if (string.IsNullOrWhiteSpace(fileName) || fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+            {
+                _logger.LogWarning("Tentativa de exclusão de arquivo com nome inválido: {FileName}", fileName);
+                return BadRequest(new { message = "Nome de arquivo inválido." });
+            }
+
+            try
+            {
+                var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", fileName);
+
+                _logger.LogInformation("Tentando deletar o arquivo em: {FilePath}", filePath);
+
+                if (System.IO.File.Exists(filePath))
+                {
+                    // Não permitir a exclusão da foto de perfil padrão
+                    if (fileName.Equals("default-profile.png", StringComparison.OrdinalIgnoreCase))
+                    {
+                        _logger.LogWarning("Tentativa de deletar a imagem de perfil padrão, operação negada.");
+                        return Forbid("A imagem de perfil padrão não pode ser excluída.");
+                    }
+
+                    System.IO.File.Delete(filePath);
+                    _logger.LogInformation("Arquivo deletado com sucesso: {FilePath}", filePath);
+                    return Ok(new { message = "Arquivo deletado com sucesso." });
+                }
+                else
+                {
+                    _logger.LogWarning("Arquivo não encontrado para exclusão: {FilePath}", filePath);
+                    return NotFound(new { message = "Arquivo não encontrado." });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao tentar deletar o arquivo: {FileName}", fileName);
+                return StatusCode(500, new { message = "Ocorreu um erro interno no servidor ao tentar deletar o arquivo." });
+            }
+        }
 }
