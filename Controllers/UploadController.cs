@@ -46,7 +46,6 @@ namespace TWTodos.Controllers
 
             return Ok(new { url = fileUrl });
         }
-    }
 
     [HttpDelete("{fileName}")]
         [Authorize] // Protege a rota, apenas usuários autenticados podem deletar.
@@ -91,4 +90,5 @@ namespace TWTodos.Controllers
                 return StatusCode(500, new { message = "Ocorreu um erro interno no servidor ao tentar deletar o arquivo." });
             }
         }
+    }
 }
