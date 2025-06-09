@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
+using System.Linq; // Adicionado para usar o LINQ
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging; // Adicionado para logging
-using Microsoft.AspNetCore.Authorization; // Adicionado para proteger a rota de exclusão
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TWTodos.Controllers
 {
@@ -14,12 +15,12 @@ namespace TWTodos.Controllers
     public class UploadController : ControllerBase
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ILogger<UploadController> _logger; // Adicionado
+        private readonly ILogger<UploadController> _logger;
 
         public UploadController(IWebHostEnvironment webHostEnvironment, ILogger<UploadController> logger)
         {
             _webHostEnvironment = webHostEnvironment;
-            _logger = logger; // Adicionado
+            _logger = logger;
         }
 
         // ROTA POST PARA UPLOAD (EXISTENTE)
@@ -51,13 +52,47 @@ namespace TWTodos.Controllers
             return Ok(new { url = fileUrl });
         }
 
-        // **** NOVA ROTA DELETE ****
+        // **** NOVA ROTA GET PARA LISTAR ARQUIVOS ****
+        [HttpGet("files")]
+        public IActionResult GetFiles()
+        {
+            try
+            {
+                var uploadsFolderPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+
+                if (!Directory.Exists(uploadsFolderPath))
+                {
+                    // Se a pasta não existe, retorna uma lista vazia.
+                    _logger.LogInformation("O diretório de uploads não foi encontrado. Retornando lista vazia.");
+                    return Ok(new string[0]);
+                }
+
+                // Obtém todos os caminhos de arquivo no diretório
+                var filePaths = Directory.GetFiles(uploadsFolderPath);
+
+                // Mapeia os caminhos completos para apenas os nomes dos arquivos
+                var fileNames = filePaths.Select(filePath => Path.GetFileName(filePath)).ToList();
+
+                // Opcional: Se quiser retornar as URLs completas em vez de apenas os nomes
+                var fileUrls = fileNames.Select(fileName => $"{Request.Scheme}://{Request.Host}/uploads/{fileName}").ToList();
+
+                _logger.LogInformation("Retornando {Count} arquivos do diretório de uploads.", fileUrls.Count);
+
+                // Retorna a lista de URLs
+                return Ok(fileUrls);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Ocorreu um erro ao tentar listar os arquivos.");
+                return StatusCode(500, new { message = "Ocorreu um erro interno no servidor ao listar os arquivos." });
+            }
+        }
+
+        // ROTA DELETE (EXISTENTE)
         [HttpDelete("{fileName}")]
-        [Authorize] // Protege a rota, apenas usuários autenticados podem deletar.
+        [Authorize]
         public IActionResult DeleteFile(string fileName)
         {
-            // Medida de segurança básica para evitar ataques de "path traversal"
-            // Impede que o cliente tente apagar arquivos fora da pasta de uploads.
             if (string.IsNullOrWhiteSpace(fileName) || fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
             {
                 _logger.LogWarning("Tentativa de exclusão de arquivo com nome inválido: {FileName}", fileName);
@@ -72,7 +107,6 @@ namespace TWTodos.Controllers
 
                 if (System.IO.File.Exists(filePath))
                 {
-                    // Não permitir a exclusão da foto de perfil padrão
                     if (fileName.Equals("default-profile.png", StringComparison.OrdinalIgnoreCase))
                     {
                         _logger.LogWarning("Tentativa de deletar a imagem de perfil padrão, operação negada.");
