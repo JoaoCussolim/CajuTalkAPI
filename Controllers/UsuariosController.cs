@@ -132,6 +132,8 @@ namespace TWTodos.Controllers
                 usuario.SenhaHash = _passwordHasher.HashPassword(usuario, updateDto.SenhaUsuario);
             }
 
+            usuario.Recado = updateDto.Recado;
+
             if (updateDto.NovaFotoPerfil != null && updateDto.NovaFotoPerfil.Length > 0)
             {
                 if (!string.IsNullOrEmpty(usuario.FotoPerfilURL) && usuario.FotoPerfilURL != DefaultProfilePicUrl)
@@ -164,11 +166,6 @@ namespace TWTodos.Controllers
                 {
                     throw;
                 }
-            }
-
-            if (!string.IsNullOrWhiteSpace(updateDto.Recado))
-            {
-                usuario.Recado = updateDto.Recado;
             }
 
             return Ok(usuario);
